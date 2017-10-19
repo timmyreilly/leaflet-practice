@@ -18,6 +18,15 @@ function initmap() {
 
     $.get('/api/pushpins', function (data) {
         console.log(data);
+        for (var i = 0; i < data.length; i++){
+            if(data[i].loc != undefined && data[i].metadata != undefined){
+                var d = data[i]; 
+                var lat = parseFloat(d.loc.y);
+                var lon = parseFloat(d.loc.x); 
+                var marker = L.marker([lat, lon]).addTo(map); 
+                marker.bindPopup("Asset: " + d.metadata.asset + " Description: " + d.metadata.description + " Author: " + d.metadata.author)
+            }
+        }
     })
 
     var marker = L.marker([37.79, -122.394]).addTo(map);
@@ -60,5 +69,27 @@ function onMapClick(e) {
         ].join("\n"))
         .openOn(map)
 }
+
+function saveData() {
+    currentPushpin.metadata = {
+        title: document.getElementById('titleTbx').value,
+        description: document.getElementById('descriptionTbx').value,
+        author: document.getElementById('authorTbx').value,
+        asset: document.getElementById('assetSelect').value
+    }
+
+    requestBody = { metadata: currentPushpin.metadata, loc: currentPushpin.geometry }
+
+    $.post('api/pushpins', requestBody, function (data) {
+        console.log(requestBody + " posted to api/pushpins")
+    }, 'json');
+
+    document.getElementById('titleTbx').value = '';
+    document.getElementById('descriptionTbx').value = '';
+    document.getElementById('authorTbx').value = '';
+    document.getElementById('assetSelect').value = '';
+    document.getElementById('inputForm').style.display = 'none';
+}
+
 
 initmap();

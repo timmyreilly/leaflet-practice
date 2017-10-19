@@ -15,6 +15,10 @@ function initmap() {
     // start the map in South-East England
     map.setView(new L.LatLng(37.78, -122.44), 14);
     map.addLayer(osm);
+
+    $.get('/api/pushpins', function (data) {
+        console.log(data);
+    })
     
 }
 

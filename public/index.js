@@ -25,32 +25,18 @@ function initmap() {
 
     var formMarker = L.marker([37.79, -122.398]).addTo(map); 
 
-    formMarker.bindPopup([
-        '<div id="inputForm" style="display:none;">',
-        '<table>',
-        '    <tr><td colspan="2"></td></tr>',
-        '    <tr><td>Title</td><td><input id="titleTbx" type="text" /></td></tr>', 
-        '    <tr><td>Description</td><td><input id="descriptionTbx" type="text" /></td></tr>',
-        '    <tr><td>Author</td><td><input id="authorTbx" type="text"/></td></tr>', 
-        '    <tr><td>Asset</td>',
-        '        <td><select id="assetSelect">', 
-        '                <option value="supplies">Supplies</option>',
-        '                <option value="staff">Staff</option>',
-        '                <option value="food">Food</option>',
-        '                <option value="water">Water</option>',
-        '                <option value="energy or fuel">Energy/Fuel</option>', 
-        '                <option value="medical">Medical</option>', 
-        '                <option value="open space">Open Space</option>',
-        '                <option value="shelter">Shelter</option>',
-        '            </select></td>',
-        '    </tr>',
-        '        <td colspan="2"><input type="button" value="Save" onclick="saveData()" style="float:right;" /></td>',
-        '    </tr>',
-        '</table>',
-        '</div>', 
-        ].join("\n"))
+    map.on('click', onMapClick); 
 
 
+}
+
+var popup = L.popup(); 
+
+function onMapClick(e){
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map)
 }
 
 initmap();

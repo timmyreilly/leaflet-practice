@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>San Francisco Resiliency Map</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles.css" type="text/css">
+    <link rel="stylesheet" href="c:\Users\tireilly\Documents\GitHub\leaflet-practice\styles.css" type="text/css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+        crossorigin="" />
+
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+        crossorigin=""></script>
+</head>
+
+<body>
+
+    <div id="mapid" style="height: 1000px"></div>
+    <script>
+        var map;
+        var ajaxRequest;
+        var plotlist;
+        var plotlayers = [];
+
+        function initmap() {
+            // set up the map
+            map = new L.Map('mapid');
+
+            // create the tile layer with correct attribution
+            var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+            var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+            var osm = new L.TileLayer(osmUrl, { minZoom: 8, maxZoom: 12, attribution: osmAttrib });
+
+            // start the map in South-East England
+            map.setView(new L.LatLng(51.3, 0.7), 9);
+            map.addLayer(osm);
+        }
+
+        initmap(); 
+    </script>
+
+</body>
+
+</html>

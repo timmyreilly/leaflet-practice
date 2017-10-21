@@ -41,48 +41,55 @@ function initmap() {
 
 var popup = L.popup();
 
+var latLng;
 function onMapClick(e) {
+    latLng = e.latlng
+    console.log(latLng)
     popup
-        .setLatLng(e.latlng)
-        .setContent([
-            '<h1>You clicked the map at</h1> ' + e.latlng.toString(),
-            '<table>',
-            '    <tr><td colspan="2"></td></tr>',
-            '    <tr><td>Title</td><td><input id="titleTbx" type="text" /></td></tr>',
-            '    <tr><td>Description</td><td><input id="descriptionTbx" type="text" /></td></tr>',
-            '    <tr><td>Author</td><td><input id="authorTbx" type="text"/></td></tr>',
-            '    <tr><td>Asset</td>',
-            '        <td><select id="assetSelect">',
-            '                <option value="supplies">Supplies</option>',
-            '                <option value="staff">Staff</option>',
-            '                <option value="food">Food</option>',
-            '                <option value="water">Water</option>',
-            '                <option value="energy or fuel">Energy/Fuel</option>',
-            '                <option value="medical">Medical</option>',
-            '                <option value="open space">Open Space</option>',
-            '                <option value="shelter">Shelter</option>',
-            '            </select></td>',
-            '    </tr>',
-            '        <td colspan="2"><input type="button" value="Save" onclick="saveData()" style="float:right;" /></td>',
-            '    </tr>',
-            '</table>',
+    .setLatLng(e.latlng)
+    .setContent([
+        '<h1>You clicked the map at</h1> ' + latLng.toString(),
+        '<table>',
+        '    <tr><td colspan="2"></td></tr>',
+        '    <tr><td>Title</td><td><input id="titleTbx" type="text" /></td></tr>',
+        '    <tr><td>Description</td><td><input id="descriptionTbx" type="text" /></td></tr>',
+        '    <tr><td>Author</td><td><input id="authorTbx" type="text"/></td></tr>',
+        '    <tr><td>Asset</td>',
+        '        <td><select id="assetSelect">',
+        '                <option value="supplies">Supplies</option>',
+        '                <option value="staff">Staff</option>',
+        '                <option value="food">Food</option>',
+        '                <option value="water">Water</option>',
+        '                <option value="energy or fuel">Energy/Fuel</option>',
+        '                <option value="medical">Medical</option>',
+        '                <option value="open space">Open Space</option>',
+        '                <option value="shelter">Shelter</option>',
+        '            </select></td>',
+        '    </tr>',
+        '        <td colspan="2"><input type="button" value="Save" onclick=saveData() style="float:right;"/></td>',
+        '    </tr>',
+        '</table>',
         ].join("\n"))
-        .openOn(map)
+    .openOn(map)
 }
 
+
 function saveData() {
+    var currentPushpin = {}
     currentPushpin.metadata = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,
         author: document.getElementById('authorTbx').value,
         asset: document.getElementById('assetSelect').value
-    }
-
+    };
+    currentPushpin.geometry = {
+        x: latLng.lng,
+        y: latLng.lat
+    };
     requestBody = { metadata: currentPushpin.metadata, loc: currentPushpin.geometry }
-
-    $.post('api/pushpins', requestBody, function (data) {
+    $.post('api/pushpins/newpushpin', requestBody, function (data) {
         console.log(requestBody + " posted to api/pushpins")
-    }, 'json');
+})
 
     document.getElementById('titleTbx').value = '';
     document.getElementById('descriptionTbx').value = '';

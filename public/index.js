@@ -9,10 +9,13 @@ function getPushpins() {
         for (var i = 0; i < data.length; i++){
             if(data[i].loc != undefined && data[i].metadata != undefined){
                 var d = data[i]; 
+                var id = d._id;
                 var lat = parseFloat(d.loc.y);
                 var lon = parseFloat(d.loc.x); 
                 var marker = L.marker([lat, lon]).addTo(map); 
-                marker.bindPopup("Asset: " + d.metadata.asset + " Description: " + d.metadata.description + " Author: " + d.metadata.author)
+                var button = `<button class = 'pushpin' data-id=${id}>Delete</button>`
+                var pushpin = `Asset: ${d.metadata.asset} Description: ${d.metadata.description} Author: ${d.metadata.author} ${button}`
+                marker.bindPopup(pushpin)
             }
         }
     })
@@ -49,7 +52,6 @@ var popup = L.popup();
 var latLng;
 function onMapClick(e) {
     latLng = e.latlng
-    console.log(latLng)
     popup
     .setLatLng(e.latlng)
     .setContent([
@@ -95,7 +97,7 @@ function saveData() {
     $.post('api/pushpins/newpushpin', requestBody, function (data) {
         console.log(requestBody + " posted to api/pushpins")
         getPushpins();
-})
+    })
 
     document.getElementById('titleTbx').value = '';
     document.getElementById('descriptionTbx').value = '';
@@ -104,5 +106,14 @@ function saveData() {
     map.closePopup();
 }
 
+$(document).on("click", ".pushpin", function(){
+    var id = this.dataset.id
+    $.ajax({
+        url: `/api/pushpins/${id}/delete`,
+        type: 'PUT',
+        success: function(response) {
+        }
+    });
+});
 
 initmap();

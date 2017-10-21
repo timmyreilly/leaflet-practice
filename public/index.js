@@ -95,7 +95,7 @@ function saveData() {
     document.getElementById('descriptionTbx').value = '';
     document.getElementById('authorTbx').value = '';
     document.getElementById('assetSelect').value = '';
-    document.getElementById('inputForm').style.display = 'none';
+    map.closePopup();
 }
 
 

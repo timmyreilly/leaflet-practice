@@ -6,7 +6,7 @@ var path = require("path");
 
 require("dotenv").config();
 
-mongoose.connect(process.env.MONGO_CONNECTION_STRING, { useMongoClient:true, promiseLibrary: global.Promise }); 
+mongoose.connect("mongodb://localhost/resiliance", { useMongoClient:true, promiseLibrary: global.Promise }); 
 
 var app = express(); 
 var Pushpin = require('./models/pushpinModel'); 

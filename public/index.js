@@ -13,9 +13,10 @@ function getPushpins() {
                 var lat = parseFloat(d.loc.y);
                 var lon = parseFloat(d.loc.x); 
                 var marker = L.marker([lat, lon]).addTo(map); 
-                var button = `<button class = 'pushpin' data-id=${id}>Delete</button>`
+                var button = `<button class = 'pushpin' data-id=${id} onclick=onPopupOpen()>Delete</button>`
                 var pushpin = `Asset: ${d.metadata.asset} Description: ${d.metadata.description} Author: ${d.metadata.author} ${button}`
                 marker.bindPopup(pushpin)
+                marker.on("popupopen", onPopupOpen);
             }
         }
     })
@@ -106,7 +107,11 @@ function saveData() {
     map.closePopup();
 }
 
-$(document).on("click", ".pushpin", function(){
+function onPopupOpen(){
+    console.log('working')
+    var tempMarker = this;
+    $(document).on("click", ".pushpin", function(){
+    map.removeLayer(tempMarker)
     var id = this.dataset.id
     $.ajax({
         url: `/api/pushpins/${id}/delete`,
@@ -115,5 +120,7 @@ $(document).on("click", ".pushpin", function(){
         }
     });
 });
+}
+
 
 initmap();

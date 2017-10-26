@@ -5,22 +5,17 @@ var plotlayers = [];
 
 function getPushpins() {
     $.get('/api/pushpins', function (data) {
-        console.log(data);
+       console.log(data);
         for (var i = 0; i < data.length; i++){
-            if(data[i].loc != undefined && data[i].metadata != undefined){
-                var d = data[i]; 
-                var id = d._id;
-                var lat = parseFloat(d.loc.y);
-                var lon = parseFloat(d.loc.x); 
-                var marker = L.marker([lat, lon]).addTo(map); 
-                var button = `<button class = 'pushpin' data-id=${id} onclick=onPopupOpen()>Delete</button>`
-                var pushpin = `Asset: ${d.metadata.asset} Description: ${d.metadata.description} Author: ${d.metadata.author} ${button}`
-                marker.bindPopup(pushpin)
-                marker.on("popupopen", onPopupOpen);
-            }
+                showPushpin(data[i]);
         }
+        /*var layerCount = 0;
+        map.eachLayer(function (layer) {
+            layerCount ++;
+        });
+        console.log("layer count is ", layerCount);
+        */
     })
-
 }
 
 function initmap() {
@@ -32,7 +27,7 @@ function initmap() {
     var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
     var osm = new L.TileLayer(osmUrl, { minZoom: 8, maxZoom: 20, attribution: osmAttrib });
 
-    // start the map in South-East England
+    // start the map in Northern San Francisco
     map.setView(new L.LatLng(37.78, -122.44), 14);
     map.addLayer(osm);
 
@@ -94,10 +89,11 @@ function saveData() {
         x: latLng.lng,
         y: latLng.lat
     };
+
     requestBody = { metadata: currentPushpin.metadata, loc: currentPushpin.geometry }
     $.post('api/pushpins/newpushpin', requestBody, function (data) {
-        console.log(requestBody + " posted to api/pushpins")
-        getPushpins();
+        console.log(requestBody + " posted to api/pushpins");
+        showPushpin(data);
     })
 
     document.getElementById('titleTbx').value = '';
@@ -107,20 +103,32 @@ function saveData() {
     map.closePopup();
 }
 
-function onPopupOpen(){
-    console.log('working')
-    var tempMarker = this;
-    $(document).on("click", ".pushpin", function(){
-    map.removeLayer(tempMarker)
-    var id = this.dataset.id
-    $.ajax({
-        url: `/api/pushpins/${id}/delete`,
-        type: 'PUT',
-        success: function(response) {
-        }
-    });
-});
+function showPushpin(pushpin){
+  if(pushpin.loc != undefined && pushpin.metadata != undefined){
+    var d = pushpin;
+    var id = d._id;
+    var lat = parseFloat(d.loc.y);
+    var lon = parseFloat(d.loc.x); 
+    var marker = L.marker([lat, lon]).addTo(map); 
+    var button = `<button class = 'pushpin' data-id=${id}>Delete</button>`
+    var pushpin = `Asset: ${d.metadata.asset} Description: ${d.metadata.description} Author: ${d.metadata.author} ${button}`
+    marker.bindPopup(pushpin)
+    marker.on("popupopen", onPopupOpen);
+ }    
 }
 
+function onPopupOpen(){
+  var tempMarker = this;
+  $(document).on("click", ".pushpin", function(){
+    map.removeLayer(tempMarker);
+    var id = this.dataset.id
+    $.ajax({
+      url: `/api/pushpins/${id}/delete`,
+      type: 'PUT',
+      success: function(response) {
+     }
+    });
+   });
+}
 
 initmap();

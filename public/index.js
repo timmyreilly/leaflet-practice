@@ -131,4 +131,15 @@ function onPopupOpen(){
    });
 }
 
+
+$(".testBtn").on("click", function(){
+    let testUser = {
+        name: 'test',
+        password: 'test'
+    }
+    $.post( "api/user/newuser", testUser, function( data ) {
+      res.json(data)
+    });
+})
+
 initmap();

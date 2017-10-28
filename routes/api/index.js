@@ -1,14 +1,7 @@
 const router = require("express").Router();
 const Pushpin = require("../../models/pushpinModel.js")
-const User = require("../../models/User.js")
 
-//User Routes
-//Test usser route
-router.post('/user/newuser', function(req, res){
-	let newUser = new User(req.body)
-	newUser.save()
-	console.log(req.body)
-});
+
 //Pushpin Routes
 router.route('/pushpins')
     .post(function (req, res) {

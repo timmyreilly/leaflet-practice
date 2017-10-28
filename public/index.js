@@ -134,10 +134,10 @@ function onPopupOpen(){
 
 $(".testBtn").on("click", function(){
     let testUser = {
-        name: 'test',
+        email: 'test@gmail.com',
         password: 'test'
     }
-    $.post( "api/user/newuser", testUser, function( data ) {
+    $.post( "/user/newuser", testUser, function( data ) {
       res.json(data)
     });
 })

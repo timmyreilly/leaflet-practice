@@ -1,14 +1,24 @@
-const User = require("../../models/User.js")
-const router = require("express").Router();
+var path = require("path");
+var passport = require("passport")
+var router = require("express").Router();
 
-//User Routes
-//Test usser route
-router.post('/newuser', function(req, res){
-	let newUser = new User
-	newUser.name = req.body.name;
-	newUser.password = newUser.generateHash(req.body.password)
-	newUser.save()
-	console.log(req.body)
-});
 
- module.exports = router
+
+	router.post('/newuser', passport.authenticate('local-signup', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+      }));
+
+	router.post('/login', passport.authenticate('local-login', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+      }));
+
+	router.get("/logout", function(req, res){
+		req.logout();
+		res.redirect('/');
+	})
+
+module.exports = router

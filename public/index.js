@@ -131,15 +131,4 @@ function onPopupOpen(){
    });
 }
 
-
-$(".testBtn").on("click", function(){
-    let testUser = {
-        email: 'test@gmail.com',
-        password: 'test'
-    }
-    $.post( "/user/newuser", testUser, function( data ) {
-      res.json(data)
-    });
-})
-
 initmap();

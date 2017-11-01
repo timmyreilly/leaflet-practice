@@ -1,0 +1,30 @@
+<!-- views/map.ejs -->
+<!doctype html>
+<html>
+
+<head>
+	<title>SF Resiliency Map</title>
+	<meta charset="utf-8" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+	crossorigin="" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+
+	<!--  Make sure you put this AFTER Leaflet's CSS -->
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+	crossorigin=""></script>
+</head>
+
+<body>
+  <span class="fa fa-user"><strong>Logged in as</strong>: <%= user.local.email %>
+
+	<a href ="/user/logout"><button>Log out</button></a></span>
+	<div id="mapid" style="height: 1500px"></div>
+	<script type='text/javascript' src='./index.js'></script>
+
+
+
+</body>
+
+</html>

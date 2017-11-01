@@ -1,11 +1,9 @@
-var express = require('express');
-var Puspin = require("../models/pushpinModel.js")
+const router = require("express").Router();
+const Pushpin = require("../../models/pushpinModel.js")
 
-var routes = function (Pushpin) {
 
-    var pushpinRouter = express.Router();
-
-    pushpinRouter.route('/')
+//Pushpin Routes
+router.route('/pushpins')
     .post(function (req, res) {
         var pushpin = new Pushpin(req.body);
         console.log(req.body); 
@@ -13,6 +11,7 @@ var routes = function (Pushpin) {
         res.status(201).send(pushpin);
     })
     .get(function (req, res) {
+        console.log(Pushpin)
         var query = {};
         if (req.query.genre) {
             query.genre = req.query.genre;
@@ -27,7 +26,7 @@ var routes = function (Pushpin) {
     });
 
     //Route for adding a new pushpin to DB
-    pushpinRouter.post("/newpushpin", function (req, res){
+    router.post("/pushpins/newpushpin", function (req, res){
         var pushpin = {
             loc: {
                 x: req.body.loc.x,
@@ -48,7 +47,7 @@ var routes = function (Pushpin) {
     })
 
     //Route for deleting pushpin from DB
-    pushpinRouter.put("/:id/delete", function (req, res){
+    router.put("/pushpins/:id/delete", function (req, res){
         Pushpin.findByIdAndRemove(req.params.id, (err, pushpin) => {  
             let response = {
                 message: "Pushpin successfully deleted",
@@ -58,7 +57,7 @@ var routes = function (Pushpin) {
         });
     });
 
-        pushpinRouter.use('/:pushpinId', function (req, res, next) {
+        router.use('/pushpins/:pushpinId', function (req, res, next) {
             Pushpin.findById(req.params.pushpinId, function (err, pushpin) {
                 if (err) {
                     res.status(500).send(err);
@@ -71,7 +70,7 @@ var routes = function (Pushpin) {
             });
         });
 
-        pushpinRouter.route('/pushpins/:pushpinId')
+        router.route('/pushpins/:pushpinId')
         .get(function (req, res) {
             res.json(req.pushpin);
         })
@@ -118,7 +117,6 @@ var routes = function (Pushpin) {
 
         });
 
-        return pushpinRouter
-    };
 
-    module.exports = routes; 
+
+ module.exports = router

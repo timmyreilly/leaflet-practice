@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser'); 
 var logger = require('./logger');
 var path = require("path");
-
+var routes = require('./routes');
 require("dotenv").config();
 
 mongoose.connect(process.env.MONGO_CONNECTION_STRING, { useMongoClient:true, promiseLibrary: global.Promise }); 
@@ -17,11 +17,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));  
 app.use(express.static(path.join(__dirname, "public")));
 
-var pushpinRouter = require('./routes/pushpinRoutes')(Pushpin);
-var geoJsonRouter = require('./routes/geoJsonRoutes')(Pushpin); 
-
-app.use('/api/pushpins', pushpinRouter);
-app.use('/api/geojson', geoJsonRouter); 
+app.use(routes)
 
 
 app.get("/", (req, res) => {

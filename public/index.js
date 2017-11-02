@@ -191,7 +191,7 @@ function onPopupOpen(e){
     ].join("\n"));
 
     marker.on('popupclose', function(e) {
-       //marker._popup.setContent(previous_content);
+       marker._popup.setContent(previous_content);
     });
 
     $(".save_updates").on("click", function(){

@@ -18,8 +18,10 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static(path.join(__dirname, "public")));
 
 var pushpinRouter = require('./routes/pushpinRoutes')(Pushpin);
+var geoJsonRouter = require('./routes/geoJsonRoutes')(Pushpin); 
 
-app.use('/api/pushpins', pushpinRouter); 
+app.use('/api/pushpins', pushpinRouter);
+app.use('/api/geojson', geoJsonRouter); 
 
 
 app.get("/", (req, res) => {

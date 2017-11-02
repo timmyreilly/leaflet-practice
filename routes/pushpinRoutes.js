@@ -29,16 +29,14 @@ var routes = function (Pushpin) {
     //Route for adding a new pushpin to DB
     pushpinRouter.post("/newpushpin", function (req, res){
         var pushpin = {
-            loc: {
-                x: req.body.loc.x,
-                y: req.body.loc.y
+            geo: {
+                type: "Point",
+                coordinates: [req.body.loc.x, req.body.loc.y],
             },
-            metadata: {
-                asset: req.body.metadata.asset,
-                author: req.body.metadata.author,
-                description: req.body.metadata.description,
-                title: req.body.metadata.title
-            }
+            asset: req.body.properties.asset,
+            author: req.body.properties.author,
+            description: req.body.properties.description,
+            title: req.body.properties.title
         }
         var newPushpin = new Pushpin(pushpin)
         newPushpin.save(function(error, result){
@@ -55,6 +53,27 @@ var routes = function (Pushpin) {
                 id: req.params.id
             };
         res.status(200).send(response);
+        });
+    });
+
+    //Route for updating a pushpin from DB
+    pushpinRouter.post("/:id/update", function (req, res){
+        var pushpinID = req.params.id;
+        console.log(req.body.asset)
+        var update = {
+            $set: {
+                asset: req.body.asset,
+                author: req.body.author,
+                description: req.body.description,
+                title: req.body.title
+            }
+        };
+        Pushpin.findByIdAndUpdate(req.params.id, update, {new: true}, function(err, result){
+            if(err){
+                console.log(err);
+            }
+            console.log(result);
+            return res.json(result);
         });
     });
 

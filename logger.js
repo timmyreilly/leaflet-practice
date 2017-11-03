@@ -1,15 +1,15 @@
-module.exports = function(request, response, next){
-    var start = +new Date(); 
+module.exports = (request, response, next) => {
+    var start = +new Date();
 
-    var stream = process.stdout; 
-    var url = request.url; 
-    var method = request.method; 
+    var stream = process.stdout;
+    var url = request.url;
+    var method = request.method;
 
-    response.on('finish', function(){
-        var duration = +new Date() - start; 
-        var message = method + ' to ' + url + '\ntook ' + duration + ' ms \n'; 
-        stream.write(message); 
+    response.on('finish', () => {
+        var duration = +new Date() - start;
+        var message = method + ' to ' + url + '\ntook ' + duration + ' ms \n';
+        stream.write(message);
 
     });
-    next(); 
+    next();
 }

@@ -1,9 +1,9 @@
-var router = require("express").Router();
-var Pushpin = require("../../models/pushpinModel.js")
-var GeoJSON = require('geojson');
+const router = require('express').Router();
+const GeoJSON = require('geojson');
+const Pushpin = require('../../models/pushpinModel.js')
 
 router.route('/geojson').get((req, res) => {
-  var query = {};
+  const query = {};
   if (req.query.asset) {
     query.asset = req.query.asset;
   }
@@ -18,30 +18,33 @@ router.route('/geojson').get((req, res) => {
     }
   })
 });
-router.route('/').post((req, res) => {
-  var pushpin = new Pushpin(req.body);
-  console.log(req.body);
-  pushpin.save();
-  res.status(201).send(pushpin);
-}).get((req, res) => {
-  var query = {};
-  if (req.query.genre) {
-    query.genre = req.query.genre;
-  }
-  Pushpin.find(query, (err, pushpins) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      res.json(pushpins);
-    }
+
+router.route('/')
+  .post((req, res) => {
+    const pushpin = new Pushpin(req.body);
+    console.log(req.body);
+    pushpin.save();
+    res.status(201).send(pushpin);
   })
-});
+  .get((req, res) => {
+    const query = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    Pushpin.find(query, (err, pushpins) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.json(pushpins);
+      }
+    })
+  });
 
 //Route for adding a new pushpin to DB
-router.post("/pushpins/newpushpin", (req, res) => {
-  var pushpin = {
+router.post('/pushpins/newpushpin', (req, res) => {
+  const pushpin = {
     geo: {
-      type: "Point",
+      type: 'Point',
       coordinates: [req.body.loc.x, req.body.loc.y]
     },
     asset: req.body.properties.asset,
@@ -49,7 +52,7 @@ router.post("/pushpins/newpushpin", (req, res) => {
     description: req.body.properties.description,
     title: req.body.properties.title
   }
-  var newPushpin = new Pushpin(pushpin)
+  const newPushpin = new Pushpin(pushpin)
   newPushpin.save((error, result) => {
     if (error)
       console.log(error);
@@ -58,9 +61,9 @@ router.post("/pushpins/newpushpin", (req, res) => {
 })
 
 //Route for deleting pushpin from DB
-router.put("/pushpins/:id/delete", (req, res) => {
+router.put('/pushpins/:id/delete', (req, res) => {
   Pushpin.findByIdAndRemove(req.params.id, (err, pushpin) => {
-    let response = {
+    const response = {
       message: "Pushpin successfully deleted",
       id: req.params.id
     };
@@ -69,10 +72,10 @@ router.put("/pushpins/:id/delete", (req, res) => {
 });
 
 //Route for updating a pushpin from DB
-router.post("/pushpins/:id/update", (req, res) => {
-  var pushpinID = req.params.id;
+router.post('/pushpins/:id/update', (req, res) => {
+  const pushpinID = req.params.id;
   console.log(req.body.asset)
-  var update = {
+  const update = {
     $set: {
       asset: req.body.asset,
       author: req.body.author,
@@ -104,47 +107,50 @@ router.use('/pushpins/:pushpinId', (req, res, next) => {
   });
 });
 
-router.route('/pushpins/:pushpinId').get((req, res) => {
-  res.json(req.pushpin);
-}).put((req, res) => {
-  console.log(req)
-  req.pushpin.title = req.body.title;
-  req.pushpin.lat = req.body.lat;
-  req.pushpin.lon = req.body.lon;
-  req.pushpin.description = req.body.description;
-  req.pushpin.author = req.body.author;
-  req.pushpin.asset = req.body.asset;
-  req.pushpin.save((err) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      res.json(req.pushpin);
+router.route('/pushpins/:pushpinId')
+  .get((req, res) => {
+    res.json(req.pushpin);
+  })
+  .put((req, res) => {
+    console.log(req)
+    req.pushpin.title = req.body.title;
+    req.pushpin.lat = req.body.lat;
+    req.pushpin.lon = req.body.lon;
+    req.pushpin.description = req.body.description;
+    req.pushpin.author = req.body.author;
+    req.pushpin.asset = req.body.asset;
+    req.pushpin.save((err) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.json(req.pushpin);
+      }
+    });
+  })
+  .patch((req, res) => {
+    if (req.body._id) {
+      delete req.body._id;
     }
-  });
-}).patch((req, res) => {
-  if (req.body._id) {
-    delete req.body._id;
-  }
-  for (var p in req.body) {
-    req.pushpin[p] = req.body[p];
-  }
+    for (let p in req.body) {
+      req.pushpin[p] = req.body[p];
+    }
 
-  req.pushpin.save((err) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      res.json(req.pushpin);
-    }
+    req.pushpin.save((err) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.json(req.pushpin);
+      }
+    });
+  })
+  .delete((req, res) => {
+    req.pushpin.remove((err) => {
+      if (err) {
+        res.statucCode(500).send(err);
+      } else {
+        res.status(204).send('removed');
+      }
+    });
   });
-}).delete((req, res) => {
-  req.pushpin.remove((err) => {
-    if (err) {
-      res.statucCode(500).send(err);
-    } else {
-      res.status(204).send("removed");
-    }
-  });
-
-});
 
 module.exports = router

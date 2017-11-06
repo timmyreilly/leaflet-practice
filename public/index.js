@@ -4,12 +4,9 @@ var plotlist;
 var plotlayers = [];
 
 function getMarkers() {
-  $.get('/api/markers', function (data) {
-    console.log(data);
-    for (var i = 0; i < data.length; i++) {
-      console.log(data[i]);
-      showMarker(data[i]);
-    }
+  $.get('/api/markers', function (markers) {
+    console.log(markers);
+    showMarkers(markers); 
   })
 }
 
@@ -21,15 +18,14 @@ function getGeoJsonFeature() {
   })
 }
 
-var geojsonLayer;
-//Takes both a Features or FeatureCollections geoJson types
-function showMarkers(geojsonFeature) {
-  //Add geoJSON objects to a geoJSON layer and add it to the map.
-  geojsonLayer = L.geoJSON(geojsonFeature, {
-    onEachFeature: addPopup
-  }).addTo(map);
+var markersLayer;
 
-  console.log(geojsonLayer);
+function showMarkers(markers) {
+  console.log(markers); 
+  //Add geoJSON objects to a geoJSON layer and add it to the map.
+  markers.forEach(m => {
+    L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map); 
+  }); 
 }
 
 function updateMarker(geojsonFeature, layer) {

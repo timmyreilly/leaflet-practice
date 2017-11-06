@@ -1,13 +1,13 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var pushpinModel = new Schema({
+const pushpinModel = new Schema({
     //coordinates should be in [longitude, latitude]
     geo: {
       type: {type: String},
       coordinates: { type: [Number] }
-   }, 
-    
+   },
+
     asset: { type: String },
     author: { type: String },
     description: { type: String },

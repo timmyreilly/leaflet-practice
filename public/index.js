@@ -24,7 +24,9 @@ function showMarkers(markers) {
   console.log(markers); 
   //Add geoJSON objects to a geoJSON layer and add it to the map.
   markers.forEach(m => {
-    L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map); 
+    var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map); 
+    x._id = m._id; 
+    addPopup(m, x); 
   }); 
 }
 
@@ -35,18 +37,17 @@ function updateMarker(geojsonFeature, layer) {
   }
 }
 
-function addPopup(feature, layer) {
-  if (feature.properties) {
-    var prop = feature.properties;
+function addPopup(data, marker) {
+  if (data) {
     var update_btn = `<button class = 'update btn'>Update</button>`
     var delete_btn = `<button class = 'delete btn'>Delete</button>`
     var saveUpdates_btn = `<button class ='save_updates btn' style='display: none'>Save Changes</button>`
-    var marker = `<div>Title: ${prop.title} Description: ${prop.description} Author: ${prop.author} Asset: ${prop.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
-    layer.bindPopup(marker);
-    layer.on("popupopen", onPopupOpen);
-    console.log(layer);
+    var markerHTML = `<div>Title: ${data.title} Description: ${data.description} Author: ${data.author} Asset: ${data.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
+    marker.bindPopup(markerHTML);
+    marker.on("popupopen", onPopupOpen);
+    console.log(marker);
   }
-  return layer;
+  // return marker;
 }
 
 
@@ -135,7 +136,7 @@ function clearTextBoxAndClosePopup() {
 
 function onPopupOpen(e) {
   var marker = this;
-  var marker_id = marker.feature.properties._id;
+  var marker_id = marker._id;
   console.log(marker_id);
   // To remove marker on click of delete
   $(".delete").on("click", function () {
@@ -144,10 +145,10 @@ function onPopupOpen(e) {
     if (confirmDelete) {
       map.removeLayer(marker);
       //var id = this.dataset.id
-      console.log(`/api/markers/${marker_id}/delete`);
+      console.log(`/api/markers/${marker_id}`);
       $.ajax({
-        url: `/api/markers/${marker_id}/delete`,
-        type: 'PUT',
+        url: `/api/markers/${marker_id}`,
+        type: 'DELETE',
         success: function (response) {
         }
       });
@@ -155,7 +156,7 @@ function onPopupOpen(e) {
   });
   // To update marker
   $(".update").on("click", function () {
-    var prop = marker.feature.properties;
+    var prop = marker;
     //var previous_content = marker._popup._content;
     var previous_content = marker._popup.getContent();
     console.log(previous_content);

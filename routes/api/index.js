@@ -1,48 +1,47 @@
 const router = require('express').Router();
 const GeoJSON = require('geojson');
-const Pushpin = require('../../models/pushpinModel.js')
+const Marker = require('../../models/markerModel.js')
 
 router.route('/geojson').get((req, res) => {
   const query = {};
   if (req.query.asset) {
     query.asset = req.query.asset;
   }
-  Pushpin.find(query).select('-__v').lean().exec((err, pushpins) => {
+  Marker.find(query).select('-__v').lean().exec((err, markers) => {
     if (err) {
       res.status(500).send(err);
     } else {
 
-      // console.log(pushpins);
-      //res.json(GeoJSON.parse(pushpins, {Point: 'coordinates'}));
-      res.json(GeoJSON.parse(pushpins, {GeoJSON: 'geo'}));
+      //res.json(GeoJSON.parse(markers, {Point: 'coordinates'}));
+      res.json(GeoJSON.parse(markers, {GeoJSON: 'geo'}));
     }
   })
 });
 
-router.route('/')
+router.route('/markers')
   .post((req, res) => {
-    const pushpin = new Pushpin(req.body);
+    const marker = new Marker(req.body);
     console.log(req.body);
-    pushpin.save();
-    res.status(201).send(pushpin);
+    marker.save();
+    res.status(201).send(marker);
   })
   .get((req, res) => {
     const query = {};
     if (req.query.genre) {
       query.genre = req.query.genre;
     }
-    Pushpin.find(query, (err, pushpins) => {
+    Marker.find(query, (err, markers) => {
       if (err) {
         res.status(500).send(err);
       } else {
-        res.json(pushpins);
+        res.json(markers);
       }
     })
   });
 
-//Route for adding a new pushpin to DB
-router.post('/pushpins/newpushpin', (req, res) => {
-  const pushpin = {
+// Route for adding a new marker to DB
+router.post('/markers/newmarker', (req, res) => {
+  const marker = {
     geo: {
       type: 'Point',
       coordinates: [req.body.loc.x, req.body.loc.y]
@@ -52,28 +51,28 @@ router.post('/pushpins/newpushpin', (req, res) => {
     description: req.body.properties.description,
     title: req.body.properties.title
   }
-  const newPushpin = new Pushpin(pushpin)
-  newPushpin.save((error, result) => {
+  const newMarker = new Marker(marker)
+  newMarker.save((error, result) => {
     if (error)
       console.log(error);
     return res.json(result);
   })
 })
 
-//Route for deleting pushpin from DB
-router.put('/pushpins/:id/delete', (req, res) => {
-  Pushpin.findByIdAndRemove(req.params.id, (err, pushpin) => {
+//Route for deleting marker from DB
+router.put('/markers/:id/delete', (req, res) => {
+  Marker.findByIdAndRemove(req.params.id, (err, marker) => {
     const response = {
-      message: "Pushpin successfully deleted",
+      message: "Marker successfully deleted",
       id: req.params.id
     };
     res.status(200).send(response);
   });
 });
 
-//Route for updating a pushpin from DB
-router.post('/pushpins/:id/update', (req, res) => {
-  const pushpinID = req.params.id;
+//Route for updating a marker from DB
+router.post('/markers/:id/update', (req, res) => {
+  const markerId = req.params.id;
   console.log(req.body.asset)
   const update = {
     $set: {
@@ -83,7 +82,7 @@ router.post('/pushpins/:id/update', (req, res) => {
       title: req.body.title
     }
   };
-  Pushpin.findByIdAndUpdate(req.params.id, update, {
+  Marker.findByIdAndUpdate(req.params.id, update, {
     new: true
   }, (err, result) => {
     if (err) {
@@ -94,59 +93,59 @@ router.post('/pushpins/:id/update', (req, res) => {
   });
 });
 
-router.use('/pushpins/:pushpinId', (req, res, next) => {
-  Pushpin.findById(req.params.pushpinId, (err, pushpin) => {
+router.use('/markers/:markerId', (req, res, next) => {
+  Marker.findById(req.params.markerId, (err, marker) => {
     if (err) {
       res.status(500).send(err);
-    } else if (pushpin) {
-      req.pushpin = pushpin;
+    } else if (marker) {
+      req.marker = marker;
       next();
     } else {
-      res.statusCode(404).send('no pushpin found');
+      res.statusCode(404).send('no marker found');
     }
   });
 });
 
-router.route('/pushpins/:pushpinId')
+router.route('/markers/:markerId')
   .get((req, res) => {
-    res.json(req.pushpin);
+    res.json(req.marker);
   })
   .put((req, res) => {
     console.log(req)
-    req.pushpin.title = req.body.title;
-    req.pushpin.lat = req.body.lat;
-    req.pushpin.lon = req.body.lon;
-    req.pushpin.description = req.body.description;
-    req.pushpin.author = req.body.author;
-    req.pushpin.asset = req.body.asset;
-    req.pushpin.save((err) => {
+    req.marker.title = req.body.title;
+    req.marker.lat = req.body.lat;
+    req.marker.lon = req.body.lon;
+    req.marker.description = req.body.description;
+    req.marker.author = req.body.author;
+    req.marker.asset = req.body.asset;
+    req.marker.save((err) => {
       if (err) {
         res.status(500).send(err);
       } else {
-        res.json(req.pushpin);
+        res.json(req.marker);
       }
     });
   })
-  .patch((req, res) => {
+  .put((req, res) => {
     if (req.body._id) {
       delete req.body._id;
     }
     for (let p in req.body) {
-      req.pushpin[p] = req.body[p];
+      req.marker[p] = req.body[p];
     }
 
-    req.pushpin.save((err) => {
+    req.marker.save((err) => {
       if (err) {
         res.status(500).send(err);
       } else {
-        res.json(req.pushpin);
+        res.json(req.marker);
       }
     });
   })
   .delete((req, res) => {
-    req.pushpin.remove((err) => {
+    req.marker.remove((err) => {
       if (err) {
-        res.statucCode(500).send(err);
+        res.status(500).send(err);
       } else {
         res.status(204).send('removed');
       }

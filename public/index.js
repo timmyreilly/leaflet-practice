@@ -3,12 +3,12 @@ var ajaxRequest;
 var plotlist;
 var plotlayers = [];
 
-function getPushpins() {
-    $.get('/api/pushpins', function (data) {
+function getMarkers() {
+    $.get('/api/markers', function (data) {
        console.log(data);
         for (var i = 0; i < data.length; i++){
             console.log(data[i]);
-                showPushpin(data[i]);
+                showMarker(data[i]);
         }
     })
 }
@@ -17,13 +17,13 @@ function getPushpins() {
 function getGeoJsonFeature() {
   //retrieves a geoJSON object of type FeaturesCollection
     $.get('/api/geojson', function (featureCollection) {
-        showPushpins(featureCollection);
+        showMarkers(featureCollection);
     })
 }
 
 var geojsonLayer;
 //Takes both a Features or FeatureCollections geoJson types
-function showPushpins(geojsonFeature){
+function showMarkers(geojsonFeature){
   //Add geoJSON objects to a geoJSON layer and add it to the map.
   geojsonLayer = L.geoJSON(geojsonFeature, {
     onEachFeature: addPopup
@@ -32,7 +32,7 @@ function showPushpins(geojsonFeature){
   console.log(geojsonLayer);
 }
 
-function updatePushpin(geojsonFeature, layer){
+function updateMarker(geojsonFeature, layer){
   if (geojsonFeature. properties) {
       layer.feature.properties = geojsonFeature.properties;
       addPopup(geojsonFeature, layer);
@@ -45,8 +45,8 @@ function addPopup(feature, layer){
     var update_btn = `<button class = 'update btn'>Update</button>`
     var delete_btn = `<button class = 'delete btn'>Delete</button>`
     var saveUpdates_btn = `<button class ='save_updates btn' style='display: none'>Save Changes</button>`
-    var pushpin = `<div>Title: ${prop.title} Description: ${prop.description} Author: ${prop.author} Asset: ${prop.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
-    layer.bindPopup(pushpin);
+    var marker = `<div>Title: ${prop.title} Description: ${prop.description} Author: ${prop.author} Asset: ${prop.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
+    layer.bindPopup(marker);
     layer.on("popupopen", onPopupOpen);
     console.log(layer);
   }
@@ -67,7 +67,7 @@ function initmap() {
     map.setView(new L.LatLng(37.78, -122.44), 14);
     map.addLayer(osm);
 
-   //getPushpins();
+   //getMarkers();
     getGeoJsonFeature();
 
     map.on('click', onMapClick);
@@ -109,25 +109,25 @@ function onMapClick(e) {
 
 
 function saveData() {
-    var currentPushpin = {}
-    currentPushpin.properties = {
+    var currentMarker = {}
+    currentMarker.properties = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,
         author: document.getElementById('authorTbx').value,
         asset: document.getElementById('assetSelect').value
     };
-    currentPushpin.geometry = {
+    currentMarker.geometry = {
         x: latLng.lng,
         y: latLng.lat
     };
 
-    requestBody = { properties: currentPushpin.properties, loc: currentPushpin.geometry }
-    $.post('api/pushpins/newpushpin', requestBody, function (data) {
-        console.log(requestBody + " posted to api/pushpins");
-        //Make pushpin into a geoJsonFeature object with data that was saved on DB 
+    requestBody = { properties: currentMarker.properties, loc: currentMarker.geometry }
+    $.post('api/markers/newmarker', requestBody, function (data) {
+        console.log(requestBody + " posted to api/markers");
+        //Make marker into a geoJsonFeature object with data that was saved on DB 
         var geojsonFeature = new GeoJsonFeature(data);
-        //show new pushpin on map
-        showPushpins(geojsonFeature);
+        //show new marker on map
+        showMarkers(geojsonFeature);
     })
 
     clearTextBoxAndClosePopup();
@@ -143,18 +143,18 @@ function clearTextBoxAndClosePopup(){
 
 function onPopupOpen(e){
     var marker = this;
-    var pushpin_id =marker.feature.properties._id;
-    console.log(pushpin_id);
+    var marker_id =marker.feature.properties._id;
+    console.log(marker_id);
     // To remove marker on click of delete
     $(".delete").on("click", function(){
      //can update confirm default box with bootstrap modal
-     var confirmDelete = confirm("Are you sure you want to delete this pushpin?");
+     var confirmDelete = confirm("Are you sure you want to delete this marker?");
      if (confirmDelete){
       map.removeLayer(marker);
        //var id = this.dataset.id
-       console.log(`/api/pushpins/${pushpin_id}/delete`);
+       console.log(`/api/markers/${marker_id}/delete`);
        $.ajax({
-         url: `/api/pushpins/${pushpin_id}/delete`,
+         url: `/api/markers/${marker_id}/delete`,
          type: 'PUT',
          success: function(response) {
          }
@@ -170,9 +170,9 @@ function onPopupOpen(e){
     marker._popup.setContent(
      ['<table>',
       '    <tr><td colspan="2"></td></tr>',
-      `    <tr><td>Title</td><td><input id="titleTbx" type="text" value=${prop.title} /> </td></tr>`,
-      `    <tr><td>Description</td><td><input id="descriptionTbx" type="text" value= ${prop.description} /> </td></tr>`,
-      `    <tr><td>Author</td><td><input id="authorTbx" type="text" value= ${prop.author} /></td></tr> `,
+      `    <tr><td>Title</td><td><input id="titleTbx" type="text" value="${prop.title}" /> </td></tr>`,
+      `    <tr><td>Description</td><td><input id="descriptionTbx" type="text" value= "${prop.description}" /> </td></tr>`,
+      `    <tr><td>Author</td><td><input id="authorTbx" type="text" value= "${prop.author}" /></td></tr> `,
       '    <tr><td>Asset</td>',
       '        <td><select id="assetSelect">',
       '                <option value="supplies">Supplies</option>',
@@ -203,12 +203,12 @@ function onPopupOpen(e){
         asset: document.getElementById('assetSelect').value
       };
 
-      var url = `/api/pushpins/${pushpin_id}/update`;
+      var url = `/api/markers/${marker_id}/update`;
       $.post(url, updatedProperties, function (data) {
         console.log(updatedProperties + " posted to api/:id/update");
         var geojsonFeature = new GeoJsonFeature(data);
-        //show updated pushpin on map
-        updatePushpin(geojsonFeature, marker);
+        //show updated marker on map
+        updateMarker(geojsonFeature, marker);
         console.log(data);
       })
       clearTextBoxAndClosePopup();
@@ -216,16 +216,16 @@ function onPopupOpen(e){
   });
 }
 
-function GeoJsonFeature(pushpin){
+function GeoJsonFeature(marker){
     var geojsonFeature = {
         type: "Feature",
-        geometry: pushpin.geo,
+        geometry: marker.geo,
         properties: {
-          _id: pushpin._id,
-          asset: pushpin.asset,
-          author: pushpin.author,
-          description: pushpin.description,
-          title: pushpin.title,
+          _id: marker._id,
+          asset: marker.asset,
+          author: marker.author,
+          description: marker.description,
+          title: marker.title,
         }    
     }
     return geojsonFeature;

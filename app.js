@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const logger = require('./logger');
 const routes = require('./routes');
-const Pushpin = require('./models/pushpinModel');
+const Marker = require('./models/markerModel');
 require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_CONNECTION_STRING,

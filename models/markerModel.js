@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const pushpinModel = new Schema({
+const markerModel = new Schema({
     //coordinates should be in [longitude, latitude]
     geo: {
       type: {type: String},
@@ -15,4 +15,4 @@ const pushpinModel = new Schema({
 
 });
 
-module.exports = mongoose.model('Pushpin', pushpinModel);
+module.exports = mongoose.model('Marker', markerModel);

@@ -2,22 +2,6 @@ const router = require('express').Router();
 const GeoJSON = require('geojson');
 const Marker = require('../../models/markerModel.js')
 
-router.route('/geojson').get((req, res) => {
-  const query = {};
-  if (req.query.asset) {
-    query.asset = req.query.asset;
-  }
-  Marker.find(query).select('-__v').lean().exec((err, markers) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-
-      //res.json(GeoJSON.parse(markers, {Point: 'coordinates'}));
-      res.json(GeoJSON.parse(markers, {GeoJSON: 'geo'}));
-    }
-  })
-});
-
 router.route('/markers')
   .post((req, res) => {
     const marker = new Marker(req.body);
@@ -39,12 +23,89 @@ router.route('/markers')
     })
   });
 
+router.use('/markers/:markerId', (req, res, next) => {
+  Marker.findById(req.params.markerId, (err, marker) => {
+    if (err) {
+      res.status(500).send(err);
+    } else if (marker) {
+      req.marker = marker;
+      next();
+    } else {
+      res.statusCode(404).send('no marker found');
+    }
+  });
+});
+
+router.route('/markers/:markerId')
+  .get((req, res) => {
+    res.json(req.marker);
+  })
+  // .put((req, res) => {
+  //   console.log(req)
+  //   req.marker.title = req.body.title;
+  //   req.marker.lat = req.body.lat;
+  //   req.marker.lon = req.body.lon;
+  //   req.marker.description = req.body.description;
+  //   req.marker.author = req.body.author;
+  //   req.marker.asset = req.body.asset;
+  //   req.marker.save((err) => {
+  //     if (err) {
+  //       res.status(500).send(err);
+  //     } else {
+  //       res.json(req.marker);
+  //     }
+  //   });
+  // })
+  // Update Marker 
+  .put((req, res) => {
+    if (req.body._id) {
+      delete req.body._id;
+    }
+    for (let p in req.body) {
+      req.marker[p] = req.body[p];
+    }
+
+    req.marker.save((err) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.json(req.marker);
+      }
+    });
+  })
+  .delete((req, res) => {
+    req.marker.remove((err) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.status(204).send('removed');
+      }
+    });
+  });
+
+
+router.route('/geojson').get((req, res) => {
+  const query = {};
+  if (req.query.asset) {
+    query.asset = req.query.asset;
+  }
+  Marker.find(query).select('-__v').lean().exec((err, markers) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+
+      res.json(GeoJSON.parse(markers, {Point: 'coordinates'}));
+      // res.json(GeoJSON.parse(markers, { GeoJSON: 'geo' }));
+    }
+  })
+});
+
 // Route for adding a new marker to DB
 router.post('/markers/newmarker', (req, res) => {
   const marker = {
     geo: {
       type: 'Point',
-      coordinates: [req.body.loc.x, req.body.loc.y]
+      coordinates: [req.body.loc.lng, req.body.loc.lat]
     },
     asset: req.body.properties.asset,
     author: req.body.properties.author,
@@ -93,63 +154,5 @@ router.post('/markers/:id/update', (req, res) => {
   });
 });
 
-router.use('/markers/:markerId', (req, res, next) => {
-  Marker.findById(req.params.markerId, (err, marker) => {
-    if (err) {
-      res.status(500).send(err);
-    } else if (marker) {
-      req.marker = marker;
-      next();
-    } else {
-      res.statusCode(404).send('no marker found');
-    }
-  });
-});
-
-router.route('/markers/:markerId')
-  .get((req, res) => {
-    res.json(req.marker);
-  })
-  .put((req, res) => {
-    console.log(req)
-    req.marker.title = req.body.title;
-    req.marker.lat = req.body.lat;
-    req.marker.lon = req.body.lon;
-    req.marker.description = req.body.description;
-    req.marker.author = req.body.author;
-    req.marker.asset = req.body.asset;
-    req.marker.save((err) => {
-      if (err) {
-        res.status(500).send(err);
-      } else {
-        res.json(req.marker);
-      }
-    });
-  })
-  .put((req, res) => {
-    if (req.body._id) {
-      delete req.body._id;
-    }
-    for (let p in req.body) {
-      req.marker[p] = req.body[p];
-    }
-
-    req.marker.save((err) => {
-      if (err) {
-        res.status(500).send(err);
-      } else {
-        res.json(req.marker);
-      }
-    });
-  })
-  .delete((req, res) => {
-    req.marker.remove((err) => {
-      if (err) {
-        res.status(500).send(err);
-      } else {
-        res.status(204).send('removed');
-      }
-    });
-  });
 
 module.exports = router

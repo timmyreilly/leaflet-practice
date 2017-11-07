@@ -73,6 +73,25 @@ router.route('/markers/:markerId')
       }
     });
   })
+  // This is updating the data by marker id 
+  .post((req, res) => {
+    if (req.body._id) {
+      delete req.body._id;
+    }
+    for (let p in req.body) {
+      req.marker[p] = req.body[p];
+    }
+
+    req.marker.save((err) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.json(req.marker);
+      }
+    });
+
+    
+  })
   .delete((req, res) => {
     req.marker.remove((err) => {
       if (err) {

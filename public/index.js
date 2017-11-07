@@ -20,29 +20,38 @@ function getGeoJsonFeature() {
 
 var markersLayer;
 
+// put the marker on the map + put popup content on each marker 
 function showMarkers(markers) {
   console.log(markers); 
   //Add geoJSON objects to a geoJSON layer and add it to the map.
   markers.forEach(m => {
     var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map); 
     x._id = m._id; 
-    addPopup(m, x); 
+    x.properties = m;
+    addPopup(x); 
   }); 
 }
 
-function updateMarker(geojsonFeature, layer) {
-  if (geojsonFeature.properties) {
-    layer.feature.properties = geojsonFeature.properties;
-    addPopup(geojsonFeature, layer);
+function updateMarker(data, marker) {
+  if (data) {
+    marker.properties.asset = data.asset;
+    marker.properties.title = data.title;
+    marker.properties.author = data.author;
+    marker.properties.description = data.description;
+    addPopup(marker);
   }
 }
 
-function addPopup(data, marker) {
-  if (data) {
+/*
+Adds html content to our popup marker 
+pass in m 
+*/
+function addPopup(marker) {
+  if (marker) {
     var update_btn = `<button class = 'update btn'>Update</button>`
     var delete_btn = `<button class = 'delete btn'>Delete</button>`
     var saveUpdates_btn = `<button class ='save_updates btn' style='display: none'>Save Changes</button>`
-    var markerHTML = `<div>Title: ${data.title} Description: ${data.description} Author: ${data.author} Asset: ${data.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
+    var markerHTML = `<div>Title: ${marker.properties.title} Description: ${marker.properties.description} Author: ${marker.properties.author} Asset: ${marker.properties.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
     marker.bindPopup(markerHTML);
     marker.on("popupopen", onPopupOpen);
     console.log(marker);
@@ -156,16 +165,17 @@ function onPopupOpen(e) {
   });
   // To update marker
   $(".update").on("click", function () {
-    var prop = marker;
+    console.log("Update marker: " + marker)
     //var previous_content = marker._popup._content;
     var previous_content = marker._popup.getContent();
     console.log(previous_content);
     marker._popup.setContent(
+      // TODO: Create logic around this form - especially around asset. This should be it's own function
       ['<table>',
         '    <tr><td colspan="2"></td></tr>',
-        `    <tr><td>Title</td><td><input id="titleTbx" type="text" value="${prop.title}" /> </td></tr>`,
-        `    <tr><td>Description</td><td><input id="descriptionTbx" type="text" value= "${prop.description}" /> </td></tr>`,
-        `    <tr><td>Author</td><td><input id="authorTbx" type="text" value= "${prop.author}" /></td></tr> `,
+        `    <tr><td>Title</td><td><input id="titleTbx" type="text" value="${marker.properties.title}" /> </td></tr>`,
+        `    <tr><td>Description</td><td><input id="descriptionTbx" type="text" value= "${marker.properties.description}" /> </td></tr>`,
+        `    <tr><td>Author</td><td><input id="authorTbx" type="text" value= "${marker.properties.author}" /></td></tr> `,
         '    <tr><td>Asset</td>',
         '        <td><select id="assetSelect">',
         '                <option value="supplies">Supplies</option>',
@@ -196,12 +206,12 @@ function onPopupOpen(e) {
         asset: document.getElementById('assetSelect').value
       };
 
-      var url = `/api/markers/${marker_id}/update`;
+      var url = `/api/markers/${marker_id}`;
       $.post(url, updatedProperties, function (data) {
-        console.log(updatedProperties + " posted to api/:id/update");
-        var geojsonFeature = new GeoJsonFeature(data);
+        console.log(updatedProperties + " posted to api");
+        console.log("whats data: ", data)
         //show updated marker on map
-        updateMarker(geojsonFeature, marker);
+        updateMarker(data, marker);
         console.log(data);
       })
       clearTextBoxAndClosePopup();

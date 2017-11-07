@@ -119,59 +119,61 @@ router.route('/geojson').get((req, res) => {
   })
 });
 
-// Route for adding a new marker to DB
-router.post('/markers/newmarker', (req, res) => {
-  const marker = {
-    geo: {
-      type: 'Point',
-      coordinates: [req.body.loc.lng, req.body.loc.lat]
-    },
-    asset: req.body.properties.asset,
-    author: req.body.properties.author,
-    description: req.body.properties.description,
-    title: req.body.properties.title
-  }
-  const newMarker = new Marker(marker)
-  newMarker.save((error, result) => {
-    if (error)
-      console.log(error);
-    return res.json(result);
-  })
-})
+// Functionality we might want to use...
 
-//Route for deleting marker from DB
-router.put('/markers/:id/delete', (req, res) => {
-  Marker.findByIdAndRemove(req.params.id, (err, marker) => {
-    const response = {
-      message: "Marker successfully deleted",
-      id: req.params.id
-    };
-    res.status(200).send(response);
-  });
-});
+// // Route for adding a new marker to DB
+// router.post('/markers/newmarker', (req, res) => {
+//   const marker = {
+//     geo: {
+//       type: 'Point',
+//       coordinates: [req.body.loc.lng, req.body.loc.lat]
+//     },
+//     asset: req.body.properties.asset,
+//     author: req.body.properties.author,
+//     description: req.body.properties.description,
+//     title: req.body.properties.title
+//   }
+//   const newMarker = new Marker(marker)
+//   newMarker.save((error, result) => {
+//     if (error)
+//       console.log(error);
+//     return res.json(result);
+//   })
+// })
 
-//Route for updating a marker from DB
-router.post('/markers/:id/update', (req, res) => {
-  const markerId = req.params.id;
-  console.log(req.body.asset)
-  const update = {
-    $set: {
-      asset: req.body.asset,
-      author: req.body.author,
-      description: req.body.description,
-      title: req.body.title
-    }
-  };
-  Marker.findByIdAndUpdate(req.params.id, update, {
-    new: true
-  }, (err, result) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(result);
-    return res.json(result);
-  });
-});
+// //Route for deleting marker from DB
+// router.put('/markers/:id/delete', (req, res) => {
+//   Marker.findByIdAndRemove(req.params.id, (err, marker) => {
+//     const response = {
+//       message: "Marker successfully deleted",
+//       id: req.params.id
+//     };
+//     res.status(200).send(response);
+//   });
+// });
+
+// //Route for updating a marker from DB
+// router.post('/markers/:id/update', (req, res) => {
+//   const markerId = req.params.id;
+//   console.log(req.body.asset)
+//   const update = {
+//     $set: {
+//       asset: req.body.asset,
+//       author: req.body.author,
+//       description: req.body.description,
+//       title: req.body.title
+//     }
+//   };
+//   Marker.findByIdAndUpdate(req.params.id, update, {
+//     new: true
+//   }, (err, result) => {
+//     if (err) {
+//       console.log(err);
+//     }
+//     console.log(result);
+//     return res.json(result);
+//   });
+// });
 
 
 module.exports = router

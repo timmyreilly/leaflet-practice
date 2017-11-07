@@ -1,7 +1,5 @@
 var map;
 var ajaxRequest;
-var plotlist;
-var plotlayers = [];
 
 function getMarkers() {
   $.get('/api/markers', function (markers) {
@@ -10,20 +8,9 @@ function getMarkers() {
   })
 }
 
-//testing geoJSON API endpoint
-function getGeoJsonFeature() {
-  //retrieves a geoJSON object of type FeaturesCollection
-  $.get('/api/geojson', function (featureCollection) {
-    showMarkers(featureCollection);
-  })
-}
-
-var markersLayer;
-
 // put the marker on the map + put popup content on each marker 
 function showMarkers(markers) {
   console.log(markers); 
-  //Add geoJSON objects to a geoJSON layer and add it to the map.
   markers.forEach(m => {
     var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map); 
     x._id = m._id; 
@@ -44,7 +31,6 @@ function updateMarker(data, marker) {
 
 /*
 Adds html content to our popup marker 
-pass in m 
 */
 function addPopup(marker) {
   if (marker) {
@@ -74,7 +60,6 @@ function initmap() {
   map.addLayer(osm);
 
   getMarkers();
-  //getGeoJsonFeature();
 
   map.on('click', onMapClick);
 }
@@ -126,9 +111,6 @@ function saveData() {
   requestBody = currentMarker
   $.post('api/markers', requestBody, function (data) {
     console.log(requestBody + " posted to api/markers");
-    //Make marker into a geoJsonFeature object with data that was saved on DB 
-    // var geojsonFeature = new GeoJsonFeature(data);
-    //show new marker on map
     showMarkers(data);
   })
 
@@ -218,21 +200,5 @@ function onPopupOpen(e) {
     });
   });
 }
-
-function GeoJsonFeature(marker) {
-  var geojsonFeature = {
-    type: "Feature",
-    geometry: marker.geo,
-    properties: {
-      _id: marker._id,
-      asset: marker.asset,
-      author: marker.author,
-      description: marker.description,
-      title: marker.title,
-    }
-  }
-  return geojsonFeature;
-}
-
 
 initmap();

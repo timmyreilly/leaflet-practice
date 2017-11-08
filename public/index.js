@@ -4,19 +4,19 @@ var ajaxRequest;
 function getMarkers() {
   $.get('/api/markers', function (markers) {
     console.log(markers);
-    showMarkers(markers); 
+    showMarkers(markers);
   })
 }
 
-// put the marker on the map + put popup content on each marker 
+// put the marker on the map + put popup content on each marker
 function showMarkers(markers) {
-  console.log(markers); 
+  console.log(markers);
   markers.forEach(m => {
-    var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map); 
-    x._id = m._id; 
+    var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map);
+    x._id = m._id;
     x.properties = m;
-    addPopup(x); 
-  }); 
+    addPopup(x);
+  });
 }
 
 function updateMarker(data, marker) {
@@ -30,7 +30,7 @@ function updateMarker(data, marker) {
 }
 
 /*
-Adds html content to our popup marker 
+Adds html content to our popup marker
 */
 function addPopup(marker) {
   if (marker) {
@@ -110,8 +110,7 @@ function saveData() {
 
   requestBody = currentMarker
   $.post('api/markers', requestBody, function (data) {
-    console.log(requestBody + " posted to api/markers");
-    showMarkers(data);
+    showMarkers([data]); // showMarkers() expects an array, temp fix?
   })
 
   clearTextBoxAndClosePopup();

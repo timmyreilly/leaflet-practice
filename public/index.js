@@ -1,6 +1,55 @@
 var map;
 var ajaxRequest;
+//custom asset icons
+var suppliesIcon =  L.AwesomeMarkers.icon({
+  icon: 'pencil',
+  markerColor: 'gray',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
+var staffIcon =  L.AwesomeMarkers.icon({
+  icon: 'users',
+  markerColor: 'purple',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
+var foodIcon = L.AwesomeMarkers.icon({
+  icon: 'cutlery',
+  markerColor: 'green',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
 
+var waterIcon = L.AwesomeMarkers.icon({
+  icon: 'tint',
+  markerColor: 'blue',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
+var energyIcon = L.AwesomeMarkers.icon({
+  icon: 'bolt',
+  markerColor: 'orange',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
+var medicalIcon =  L.AwesomeMarkers.icon({
+  icon: 'medkit',
+  markerColor: 'red',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
+var openSpaceIcon =  L.AwesomeMarkers.icon({
+  icon: 'tree',
+  markerColor: 'green',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
+var shelterIcon = L.AwesomeMarkers.icon({
+  icon: 'home',
+  markerColor: 'blue',
+  prefix: 'fa', 
+  iconColor: 'black'
+  })
 function getMarkers() {
   $.get('/api/markers', function (markers) {
     console.log(markers);
@@ -10,9 +59,39 @@ function getMarkers() {
 
 // put the marker on the map + put popup content on each marker
 function showMarkers(markers) {
+  var icon;
   console.log(markers);
   markers.forEach(m => {
-    var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map);
+    console.log(m.asset)
+    switch(m.asset){
+      case "supplies":
+        icon=suppliesIcon;
+        break;
+      case "staff":
+        icon=staffIcon;
+        break;
+      case "food":
+        icon=foodIcon;
+        break;
+      case "water":
+        icon=waterIcon;
+        break;
+      case "energy or fuel":
+        icon=energyIcon;
+        break;
+      case "medical":
+        icon=medicalIcon;
+        break;
+      case "open space":
+        icon=openSpaceIcon;
+        break;
+      case "shelter":
+        icon=shelterIcon;
+        break;
+      default:
+        icon=suppliesIcon;
+    }
+    var x = L.marker([m.coordinates[1], m.coordinates[0]], {icon:icon}).addTo(map);
     x._id = m._id;
     x.properties = m;
     addPopup(x);

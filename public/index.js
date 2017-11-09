@@ -3,14 +3,12 @@ var ajaxRequest;
 
 function getMarkers() {
   $.get('/api/markers', function (markers) {
-    console.log(markers);
     showMarkers(markers);
   })
 }
 
 // put the marker on the map + put popup content on each marker
 function showMarkers(markers) {
-  console.log(markers);
   markers.forEach(m => {
     var x = L.marker([m.coordinates[1], m.coordinates[0]]).addTo(map);
     x._id = m._id;
@@ -40,9 +38,7 @@ function addPopup(marker) {
     var markerHTML = `<div>Title: ${marker.properties.title} Description: ${marker.properties.description} Author: ${marker.properties.author} Asset: ${marker.properties.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
     marker.bindPopup(markerHTML);
     marker.on("popupopen", onPopupOpen);
-    console.log(marker);
   }
-  // return marker;
 }
 
 
@@ -127,7 +123,6 @@ function clearTextBoxAndClosePopup() {
 function onPopupOpen(e) {
   var marker = this;
   var marker_id = marker._id;
-  console.log(marker_id);
   // To remove marker on click of delete
   $(".delete").on("click", function () {
     //can update confirm default box with bootstrap modal
@@ -135,7 +130,6 @@ function onPopupOpen(e) {
     if (confirmDelete) {
       map.removeLayer(marker);
       //var id = this.dataset.id
-      console.log(`/api/markers/${marker_id}`);
       $.ajax({
         url: `/api/markers/${marker_id}`,
         type: 'DELETE',
@@ -147,10 +141,8 @@ function onPopupOpen(e) {
 
   // To update marker
   $(".update").on("click", function () {
-    console.log("Update marker: " + marker)
     //var previous_content = marker._popup._content;
     var previous_content = marker._popup.getContent();
-    console.log(previous_content);
     marker._popup.setContent(
       // TODO: Create logic around this form - especially around asset. This should be it's own function
       // quick fix added below for the asset dropdown
@@ -193,11 +185,8 @@ function onPopupOpen(e) {
 
       var url = `/api/markers/${marker_id}`;
       $.post(url, updatedProperties, function (data) {
-        console.log(updatedProperties + " posted to api");
-        console.log("whats data: ", data)
         //show updated marker on map
         updateMarker(data, marker);
-        console.log(data);
       })
       clearTextBoxAndClosePopup();
     });

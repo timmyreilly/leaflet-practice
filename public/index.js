@@ -1,5 +1,5 @@
 var map;
-var ajaxRequest;
+var latLng;
 
 function getMarkers() {
   $.get('/api/markers', (markers) => {
@@ -41,7 +41,6 @@ function addPopup(marker) {
   }
 }
 
-
 function initmap() {
   // set up the map
   map = new L.Map('mapid');
@@ -60,16 +59,12 @@ function initmap() {
   map.on('click', onMapClick);
 }
 
-
-var popup = L.popup();
-
-var latLng;
 function onMapClick(e) {
-  latLng = e.latlng
-  popup
-    .setLatLng(e.latlng)
+  latLng = e.latlng;
+  const popup = L.popup()
+    .setLatLng(latLng)
     .setContent([
-      '<h1>You clicked the map at</h1> ' + latLng.toString(),
+      '<h1>Add location at </h1>',
       '<table>',
       '    <tr><td colspan="2"></td></tr>',
       '    <tr><td>Title</td><td><input id="titleTbx" type="text" /></td></tr>',
@@ -91,23 +86,22 @@ function onMapClick(e) {
       '    </tr>',
       '</table>',
     ].join("\n"))
-    .openOn(map)
+    .openOn(map);
 }
 
 
 function saveData() {
-  var currentMarker = {}
-  currentMarker.title = document.getElementById('titleTbx').value;
-  currentMarker.description = document.getElementById('descriptionTbx').value;
-  currentMarker.author = document.getElementById('authorTbx').value;
-  currentMarker.asset = document.getElementById('assetSelect').value;
+  const currentMarker = {
+    title: document.getElementById('titleTbx').value,
+    description: document.getElementById('descriptionTbx').value,
+    author: document.getElementById('authorTbx').value,
+    asset: document.getElementById('assetSelect').value,
+    coordinates: [latLng.lng, latLng.lat],
+  }
 
-  currentMarker.coordinates = [latLng.lng, latLng.lat]
-
-  requestBody = currentMarker
-  $.post('api/markers', requestBody, (data) => {
+  $.post('api/markers', currentMarker, (data) => {
     showMarkers([data]); // showMarkers() expects an array, temp fix?
-  })
+  });
 
   clearTextBoxAndClosePopup();
 }
@@ -121,28 +115,25 @@ function clearTextBoxAndClosePopup() {
 }
 
 function onPopupOpen(e) {
-  var marker = this;
-  var marker_id = marker._id;
+  const marker = this;
+  const marker_id = marker._id;
   // To remove marker on click of delete
   $(".delete").on("click", () => {
-    //can update confirm default box with bootstrap modal
-    var confirmDelete = confirm("Are you sure you want to delete this marker?");
+    // can update confirm default box with bootstrap modal
+    const confirmDelete = confirm("Are you sure you want to delete this marker?");
     if (confirmDelete) {
       map.removeLayer(marker);
-      //var id = this.dataset.id
       $.ajax({
         url: `/api/markers/${marker_id}`,
         type: 'DELETE',
-        success: (response) => {
-        }
+        success: (response) => {}, // ?
       });
     }
   });
 
   // To update marker
   $(".update").on("click", () => {
-    //var previous_content = marker._popup._content;
-    var previous_content = marker._popup.getContent();
+    const previous_content = marker._popup.getContent();
     marker._popup.setContent(
       // TODO: Create logic around this form - especially around asset. This should be it's own function
       // quick fix added below for the asset dropdown
@@ -175,19 +166,18 @@ function onPopupOpen(e) {
     });
 
     $(".save_updates").on("click", () => {
-      var updatedProperties = {}
-      updatedProperties = {
+      const updatedProperties = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,
         author: document.getElementById('authorTbx').value,
-        asset: document.getElementById('assetSelect').value
+        asset: document.getElementById('assetSelect').value,
       };
 
-      var url = `/api/markers/${marker_id}`;
-      $.post(url, updatedProperties, (data) => {
-        //show updated marker on map
+      $.post(`/api/markers/${marker_id}`, updatedProperties, (data) => {
+        // show updated marker on map
         updateMarker(data, marker);
       })
+      
       clearTextBoxAndClosePopup();
     });
   });

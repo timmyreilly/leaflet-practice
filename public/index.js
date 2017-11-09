@@ -144,6 +144,7 @@ function onPopupOpen(e) {
       });
     }
   });
+
   // To update marker
   $(".update").on("click", function () {
     console.log("Update marker: " + marker)
@@ -152,6 +153,7 @@ function onPopupOpen(e) {
     console.log(previous_content);
     marker._popup.setContent(
       // TODO: Create logic around this form - especially around asset. This should be it's own function
+      // quick fix added below for the asset dropdown
       ['<table>',
         '    <tr><td colspan="2"></td></tr>',
         `    <tr><td>Title</td><td><input id="titleTbx" type="text" value="${marker.properties.title}" /> </td></tr>`,
@@ -173,6 +175,8 @@ function onPopupOpen(e) {
         '    </tr>',
         '</table>',
       ].join("\n"));
+
+    $(`#assetSelect option[value="${marker.properties.asset}"]`).prop('selected', true); // quick fix
 
     marker.on('popupclose', function (e) {
       marker._popup.setContent(previous_content);

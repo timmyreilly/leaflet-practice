@@ -2,7 +2,7 @@ var map;
 var ajaxRequest;
 
 function getMarkers() {
-  $.get('/api/markers', function (markers) {
+  $.get('/api/markers', (markers) => {
     showMarkers(markers);
   })
 }
@@ -105,7 +105,7 @@ function saveData() {
   currentMarker.coordinates = [latLng.lng, latLng.lat]
 
   requestBody = currentMarker
-  $.post('api/markers', requestBody, function (data) {
+  $.post('api/markers', requestBody, (data) => {
     showMarkers([data]); // showMarkers() expects an array, temp fix?
   })
 
@@ -124,7 +124,7 @@ function onPopupOpen(e) {
   var marker = this;
   var marker_id = marker._id;
   // To remove marker on click of delete
-  $(".delete").on("click", function () {
+  $(".delete").on("click", () => {
     //can update confirm default box with bootstrap modal
     var confirmDelete = confirm("Are you sure you want to delete this marker?");
     if (confirmDelete) {
@@ -133,14 +133,14 @@ function onPopupOpen(e) {
       $.ajax({
         url: `/api/markers/${marker_id}`,
         type: 'DELETE',
-        success: function (response) {
+        success: (response) => {
         }
       });
     }
   });
 
   // To update marker
-  $(".update").on("click", function () {
+  $(".update").on("click", () => {
     //var previous_content = marker._popup._content;
     var previous_content = marker._popup.getContent();
     marker._popup.setContent(
@@ -170,11 +170,11 @@ function onPopupOpen(e) {
 
     $(`#assetSelect option[value="${marker.properties.asset}"]`).prop('selected', true); // quick fix
 
-    marker.on('popupclose', function (e) {
+    marker.on('popupclose', (e) => {
       marker._popup.setContent(previous_content);
     });
 
-    $(".save_updates").on("click", function () {
+    $(".save_updates").on("click", () => {
       var updatedProperties = {}
       updatedProperties = {
         title: document.getElementById('titleTbx').value,
@@ -184,7 +184,7 @@ function onPopupOpen(e) {
       };
 
       var url = `/api/markers/${marker_id}`;
-      $.post(url, updatedProperties, function (data) {
+      $.post(url, updatedProperties, (data) => {
         //show updated marker on map
         updateMarker(data, marker);
       })

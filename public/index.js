@@ -1,103 +1,134 @@
-var map;
-var ajaxRequest;
+let map;
+let ajaxRequest;
+//represents assets 
+const layers = {}; 
+
 //custom asset icons
-var suppliesIcon =  L.AwesomeMarkers.icon({
+let suppliesIcon =  L.AwesomeMarkers.icon({
   icon: 'pencil',
   markerColor: 'gray',
   prefix: 'fa', 
   iconColor: 'black'
   })
-var staffIcon =  L.AwesomeMarkers.icon({
+let staffIcon =  L.AwesomeMarkers.icon({
   icon: 'users',
   markerColor: 'purple',
   prefix: 'fa', 
   iconColor: 'black'
   })
-var foodIcon = L.AwesomeMarkers.icon({
+let foodIcon = L.AwesomeMarkers.icon({
   icon: 'cutlery',
   markerColor: 'green',
   prefix: 'fa', 
   iconColor: 'black'
   })
 
-var waterIcon = L.AwesomeMarkers.icon({
+let waterIcon = L.AwesomeMarkers.icon({
   icon: 'tint',
   markerColor: 'blue',
   prefix: 'fa', 
   iconColor: 'black'
   })
-var energyIcon = L.AwesomeMarkers.icon({
+let energyIcon = L.AwesomeMarkers.icon({
   icon: 'bolt',
   markerColor: 'orange',
   prefix: 'fa', 
   iconColor: 'black'
   })
-var medicalIcon =  L.AwesomeMarkers.icon({
+let medicalIcon =  L.AwesomeMarkers.icon({
   icon: 'medkit',
   markerColor: 'red',
   prefix: 'fa', 
   iconColor: 'black'
   })
-var openSpaceIcon =  L.AwesomeMarkers.icon({
+let openSpaceIcon =  L.AwesomeMarkers.icon({
   icon: 'tree',
   markerColor: 'green',
   prefix: 'fa', 
   iconColor: 'black'
   })
-var shelterIcon = L.AwesomeMarkers.icon({
+let shelterIcon = L.AwesomeMarkers.icon({
   icon: 'home',
   markerColor: 'blue',
   prefix: 'fa', 
   iconColor: 'black'
   })
+
+function getIcon(layerName) {
+  let icons = {
+    "supplies": suppliesIcon,
+    "staff": staffIcon,
+    "food": foodIcon,
+    "water": waterIcon,
+    "energy or fuel": energyIcon,
+    "medical": medicalIcon,
+    "open space": openSpaceIcon,
+    "shelter": shelterIcon,
+    'default': suppliesIcon
+  }
+  return (icons[layerName] || icons["default"]);
+}
+ 
 function getMarkers() {
   $.get('/api/markers', function (markers) {
-    console.log(markers);
-    showMarkers(markers);
+    initLayers(markers);
+   // showMarkers(markers);
   })
 }
 
-// put the marker on the map + put popup content on each marker
-function showMarkers(markers) {
-  var icon;
-  console.log(markers);
+//should only be called when initializating map
+function initLayers(markers){
   markers.forEach(m => {
-    console.log(m.asset)
-    switch(m.asset){
-      case "supplies":
-        icon=suppliesIcon;
-        break;
-      case "staff":
-        icon=staffIcon;
-        break;
-      case "food":
-        icon=foodIcon;
-        break;
-      case "water":
-        icon=waterIcon;
-        break;
-      case "energy or fuel":
-        icon=energyIcon;
-        break;
-      case "medical":
-        icon=medicalIcon;
-        break;
-      case "open space":
-        icon=openSpaceIcon;
-        break;
-      case "shelter":
-        icon=shelterIcon;
-        break;
-      default:
-        icon=suppliesIcon;
-    }
-    var x = L.marker([m.coordinates[1], m.coordinates[0]], {icon:icon}).addTo(map);
-    x._id = m._id;
-    x.properties = m;
-    addPopup(x);
-  });
+  addLayer(m);
+  })
 }
 
+//Creates a group layer based on the marker's asset name and adds it to map
+function addLayer(marker){
+  //add extra check to avoid redeclaring a layer group
+  if (!layers[marker.asset]){
+    layers[marker.asset] = L.layerGroup().addTo(map);
+    addLayerButton(marker.asset, getIcon(marker.asset).options.icon);
+   }
+   showMarker(marker);
+}
+
+//Should we rename this function to addMarker(marker)?
+// add the marker to a layer group + put popup content on each marker
+function showMarker(marker) {
+   const customIcon = getIcon(marker.asset);
+   const x = L.marker([marker.coordinates[1], marker.coordinates[0]], {icon:customIcon});
+   layers[marker.asset].addLayer(x);
+   x._id = marker._id;
+   x.properties = marker;
+   addPopup(x);
+   console.log(layers);
+}
+
+//Create a button to toggle the layer
+function addLayerButton(layerName, iconName){
+  //create button
+  let layerItem = document.createElement('div')
+  layerItem.innerHTML = `${layerName} <span class="fa fa-${iconName}"></span>`
+  layerItem.className = "layer-button"
+  layerItem.classList.add("toggle-active"); //layers are initially active
+  layerItem.setAttribute('ref', `${layerName}-toggle`) //will be used to toggle on mobile
+  layerItem.addEventListener('click', (e) => toggleMapLayer(layerName))
+  document.getElementById("layer-buttons").appendChild(layerItem);
+
+  function toggleMapLayer(layerName){
+    //Toggle active UI status
+    layerItem.classList.toggle('toggle-active')
+
+    const layer = layers[layerName];
+    if (map.hasLayer(layer)) {
+      map.removeLayer(layer)
+    } else {
+      map.addLayer(layer)
+    }
+  }
+}
+  
 function updateMarker(data, marker) {
   if (data) {
     marker.properties.asset = data.asset;
@@ -113,26 +144,23 @@ Adds html content to our popup marker
 */
 function addPopup(marker) {
   if (marker) {
-    var update_btn = `<button class = 'update btn'>Update</button>`
-    var delete_btn = `<button class = 'delete btn'>Delete</button>`
-    var saveUpdates_btn = `<button class ='save_updates btn' style='display: none'>Save Changes</button>`
-    var markerHTML = `<div>Title: ${marker.properties.title} Description: ${marker.properties.description} Author: ${marker.properties.author} Asset: ${marker.properties.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
+    let update_btn = `<button class = 'update btn'>Update</button>`
+    let delete_btn = `<button class = 'delete btn'>Delete</button>`
+    let saveUpdates_btn = `<button class ='save_updates btn' style='display: none'>Save Changes</button>`
+    let markerHTML = `<div>Title: ${marker.properties.title} Description: ${marker.properties.description} Author: ${marker.properties.author} Asset: ${marker.properties.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
     marker.bindPopup(markerHTML);
     marker.on("popupopen", onPopupOpen);
-    console.log(marker);
   }
-  // return marker;
 }
-
 
 function initmap() {
   // set up the map
   map = new L.Map('mapid');
 
   // create the tile layer with correct attribution
-  var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-  var osm = new L.TileLayer(osmUrl, { minZoom: 8, maxZoom: 20, attribution: osmAttrib });
+  let osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  let osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+  let osm = new L.TileLayer(osmUrl, { minZoom: 8, maxZoom: 20, attribution: osmAttrib });
 
   // start the map in Northern San Francisco
   map.setView(new L.LatLng(37.78, -122.44), 14);
@@ -144,9 +172,9 @@ function initmap() {
 }
 
 
-var popup = L.popup();
+let popup = L.popup();
 
-var latLng;
+let latLng;
 function onMapClick(e) {
   latLng = e.latlng
   popup
@@ -179,7 +207,7 @@ function onMapClick(e) {
 
 
 function saveData() {
-  var currentMarker = {}
+  let currentMarker = {}
   currentMarker.title = document.getElementById('titleTbx').value;
   currentMarker.description = document.getElementById('descriptionTbx').value;
   currentMarker.author = document.getElementById('authorTbx').value;
@@ -189,7 +217,7 @@ function saveData() {
 
   requestBody = currentMarker
   $.post('api/markers', requestBody, function (data) {
-    showMarkers([data]); // showMarkers() expects an array, temp fix?
+    addLayer(data);
   })
 
   clearTextBoxAndClosePopup();
@@ -204,21 +232,25 @@ function clearTextBoxAndClosePopup() {
 }
 
 function onPopupOpen(e) {
-  var marker = this;
-  var marker_id = marker._id;
-  console.log(marker_id);
+  let marker = this;
+  let marker_id = marker._id;
   // To remove marker on click of delete
   $(".delete").on("click", function () {
     //can update confirm default box with bootstrap modal
-    var confirmDelete = confirm("Are you sure you want to delete this marker?");
+    let confirmDelete = confirm("Are you sure you want to delete this marker?");
     if (confirmDelete) {
-      map.removeLayer(marker);
-      //var id = this.dataset.id
       console.log(`/api/markers/${marker_id}`);
       $.ajax({
         url: `/api/markers/${marker_id}`,
         type: 'DELETE',
         success: function (response) {
+          console.log("Succesfully delete marker");
+          let leaflet_id = marker._leaflet_id
+          let layer = layers[marker.properties.asset];
+          //Have to do this extra step to delete the marker reference that is inside the layer group
+          delete layer._layers[leaflet_id];
+          //show in UI
+          map.removeLayer(marker);
         }
       });
     }
@@ -227,8 +259,8 @@ function onPopupOpen(e) {
   $(".update").on("click", function () {
     console.log("Update marker: " + marker)
     //var previous_content = marker._popup._content;
-    var previous_content = marker._popup.getContent();
-    console.log(previous_content);
+    let previous_content = marker._popup.getContent();
+   // console.log(previous_content);
     marker._popup.setContent(
       // TODO: Create logic around this form - especially around asset. This should be it's own function
       ['<table>',
@@ -258,7 +290,7 @@ function onPopupOpen(e) {
     });
 
     $(".save_updates").on("click", function () {
-      var updatedProperties = {}
+      let updatedProperties = {}
       updatedProperties = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,
@@ -266,10 +298,10 @@ function onPopupOpen(e) {
         asset: document.getElementById('assetSelect').value
       };
 
-      var url = `/api/markers/${marker_id}`;
+      let url = `/api/markers/${marker_id}`;
       $.post(url, updatedProperties, function (data) {
         console.log(updatedProperties + " posted to api");
-        console.log("whats data: ", data)
+       // console.log("whats data: ", data)
         //show updated marker on map
         updateMarker(data, marker);
         console.log(data);

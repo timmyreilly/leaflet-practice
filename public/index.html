@@ -14,14 +14,19 @@
         crossorigin="" />
 
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+    <link rel="stylesheet" href="./styles.css">
     <script src="https://use.fontawesome.com/3758da217b.js"></script>
-
-
-
 </head>
 
 <body>
     <div id="mapid" style="height: 1500px"></div>
+    <div ref="panel" class="layer-panel">
+        <div ref="toggle" class="layer-toggle">Layers</div>
+        <div class="layer-panel-content">
+          <h3>Layers</h3>
+          <div ref="buttons" id="layer-buttons" class="layer-buttons"></div>
+        </div>
+      </div>
     
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="

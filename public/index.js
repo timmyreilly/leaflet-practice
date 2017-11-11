@@ -1,56 +1,56 @@
 let map;
-let ajaxRequest;
-//represents assets 
-const layers = {}; 
+let latLng;
+//represents assets
+const layers = {};
 
 //custom asset icons
 let suppliesIcon =  L.AwesomeMarkers.icon({
   icon: 'pencil',
   markerColor: 'gray',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 let staffIcon =  L.AwesomeMarkers.icon({
   icon: 'users',
   markerColor: 'purple',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 let foodIcon = L.AwesomeMarkers.icon({
   icon: 'cutlery',
   markerColor: 'green',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 
 let waterIcon = L.AwesomeMarkers.icon({
   icon: 'tint',
   markerColor: 'blue',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 let energyIcon = L.AwesomeMarkers.icon({
   icon: 'bolt',
   markerColor: 'orange',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 let medicalIcon =  L.AwesomeMarkers.icon({
   icon: 'medkit',
   markerColor: 'red',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 let openSpaceIcon =  L.AwesomeMarkers.icon({
   icon: 'tree',
   markerColor: 'green',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 let shelterIcon = L.AwesomeMarkers.icon({
   icon: 'home',
   markerColor: 'blue',
-  prefix: 'fa', 
+  prefix: 'fa',
   iconColor: 'black'
   })
 
@@ -68,7 +68,7 @@ function getIcon(layerName) {
   }
   return (icons[layerName] || icons["default"]);
 }
- 
+
 function getMarkers() {
   $.get('/api/markers', function (markers) {
     initLayers(markers);
@@ -128,7 +128,7 @@ function addLayerButton(layerName, iconName){
     }
   }
 }
-  
+
 function updateMarker(data, marker) {
   if (data) {
     marker.properties.asset = data.asset;
@@ -144,13 +144,59 @@ Adds html content to our popup marker
 */
 function addPopup(marker) {
   if (marker) {
-    let update_btn = `<button class = 'update btn'>Update</button>`
-    let delete_btn = `<button class = 'delete btn'>Delete</button>`
-    let saveUpdates_btn = `<button class ='save_updates btn' style='display: none'>Save Changes</button>`
-    let markerHTML = `<div>Title: ${marker.properties.title} Description: ${marker.properties.description} Author: ${marker.properties.author} Asset: ${marker.properties.asset} </div> ${update_btn} ${delete_btn} ${saveUpdates_btn} `
-    marker.bindPopup(markerHTML);
-    marker.on("popupopen", onPopupOpen);
+    marker.bindPopup(popupContent(marker, 'add'));
+    marker.on('popupopen', onPopupOpen);
   }
+}
+
+function popupContent (marker, mode) {
+  if (marker) {
+    var { title, description, author, asset } = marker.properties;
+  } else {
+    var title = '';
+    var description = '';
+    var author = '';
+  }
+
+  // default mode
+  let isDisabled = true;
+  let buttons = `<button class="edit btn">Edit</button><button class="delete btn">Delete</button>`;
+
+  if (mode === 'update') {
+    buttons = `<button class ="update">Save Changes</button>`;
+    isDisabled = false;
+  } else if (mode == 'create') {
+    buttons = `<input type="button" value="Add Location" onclick=saveData() />`;
+    isDisabled = false;
+  }
+
+  const content = `
+    <table>
+      <tr><td colspan="2"></td></tr>
+      <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+      <tr><td>Description</td><td><input id="descriptionTbx" type="text" value="${description}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+      <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+      <tr><td>Asset</td>
+          <td>
+            <select id="assetSelect" ${isDisabled ? 'disabled' : ''}>
+              <option ${asset === 'supplies' ? 'selected' : ''} value="supplies">Supplies</option>
+              <option ${asset === 'staff' ? 'selected' : ''} value="staff">Staff</option>
+              <option ${asset === 'food' ? 'selected' : ''} value="food">Food</option>
+              <option ${asset === 'water' ? 'selected' : ''} value="water">Water</option>
+              <option ${asset === 'energy or fuel' ? 'selected' : ''} value="energy or fuel">Energy/Fuel</option>
+              <option ${asset === 'medical' ? 'selected' : ''} value="medical">Medical</option>
+              <option ${asset === 'open space' ? 'selected' : ''} value="open space">Open Space</option>
+              <option ${asset === 'shelter' ? 'selected' : ''} value="shelter">Shelter</option>
+            </select></td>
+          </td>
+      </tr>
+    </table>
+    <div>
+      ${buttons}
+    </div>
+  `;
+
+  return content;
 }
 
 function initmap() {
@@ -171,38 +217,12 @@ function initmap() {
   map.on('click', onMapClick);
 }
 
-
-let popup = L.popup();
-
-let latLng;
 function onMapClick(e) {
-  latLng = e.latlng
-  popup
-    .setLatLng(e.latlng)
-    .setContent([
-      '<h1>You clicked the map at</h1> ' + latLng.toString(),
-      '<table>',
-      '    <tr><td colspan="2"></td></tr>',
-      '    <tr><td>Title</td><td><input id="titleTbx" type="text" /></td></tr>',
-      '    <tr><td>Description</td><td><input id="descriptionTbx" type="text" /></td></tr>',
-      '    <tr><td>Author</td><td><input id="authorTbx" type="text"/></td></tr>',
-      '    <tr><td>Asset</td>',
-      '        <td><select id="assetSelect">',
-      '                <option value="supplies">Supplies</option>',
-      '                <option value="staff">Staff</option>',
-      '                <option value="food">Food</option>',
-      '                <option value="water">Water</option>',
-      '                <option value="energy or fuel">Energy/Fuel</option>',
-      '                <option value="medical">Medical</option>',
-      '                <option value="open space">Open Space</option>',
-      '                <option value="shelter">Shelter</option>',
-      '            </select></td>',
-      '    </tr>',
-      '        <td colspan="2"><input type="button" value="Save" onclick=saveData() style="float:right;"/></td>',
-      '    </tr>',
-      '</table>',
-    ].join("\n"))
-    .openOn(map)
+  latLng = e.latlng;
+  const popup = L.popup()
+    .setLatLng(latLng)
+    .setContent(popupContent(null, 'create'))
+    .openOn(map);
 }
 
 
@@ -256,56 +276,27 @@ function onPopupOpen(e) {
     }
   });
   // To update marker
-  $(".update").on("click", function () {
-    console.log("Update marker: " + marker)
-    //var previous_content = marker._popup._content;
-    let previous_content = marker._popup.getContent();
-   // console.log(previous_content);
-    marker._popup.setContent(
-      // TODO: Create logic around this form - especially around asset. This should be it's own function
-      ['<table>',
-        '    <tr><td colspan="2"></td></tr>',
-        `    <tr><td>Title</td><td><input id="titleTbx" type="text" value="${marker.properties.title}" /> </td></tr>`,
-        `    <tr><td>Description</td><td><input id="descriptionTbx" type="text" value= "${marker.properties.description}" /> </td></tr>`,
-        `    <tr><td>Author</td><td><input id="authorTbx" type="text" value= "${marker.properties.author}" /></td></tr> `,
-        '    <tr><td>Asset</td>',
-        '        <td><select id="assetSelect">',
-        '                <option value="supplies">Supplies</option>',
-        '                <option value="staff">Staff</option>',
-        '                <option value="food">Food</option>',
-        '                <option value="water">Water</option>',
-        '                <option value="energy or fuel">Energy/Fuel</option>',
-        '                <option value="medical">Medical</option>',
-        '                <option value="open space">Open Space</option>',
-        '                <option value="shelter">Shelter</option>',
-        '            </select></td>',
-        '    </tr>',
-        '      <td colspan="2"><button class ="save_updates">Save Changes</button></td>',
-        '    </tr>',
-        '</table>',
-      ].join("\n"));
+  $(".edit").on("click", function () {
+    const previous_content = marker._popup.getContent();
+    marker._popup.setContent(popupContent(marker, 'update'));
 
     marker.on('popupclose', function (e) {
       marker._popup.setContent(previous_content);
     });
 
-    $(".save_updates").on("click", function () {
-      let updatedProperties = {}
-      updatedProperties = {
+    $(".update").on("click", function () {
+      const updatedProperties = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,
         author: document.getElementById('authorTbx').value,
-        asset: document.getElementById('assetSelect').value
+        asset: document.getElementById('assetSelect').value,
       };
 
-      let url = `/api/markers/${marker_id}`;
-      $.post(url, updatedProperties, function (data) {
-        console.log(updatedProperties + " posted to api");
-       // console.log("whats data: ", data)
-        //show updated marker on map
+      $.post(`/api/markers/${marker_id}`, updatedProperties, (data) => {
+        // show updated marker on map
         updateMarker(data, marker);
-        console.log(data);
-      })
+      });
+
       clearTextBoxAndClosePopup();
     });
   });

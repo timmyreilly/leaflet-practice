@@ -70,7 +70,7 @@ function getIcon(layerName) {
 }
 
 function getMarkers() {
-  $.get('/api/markers', function (markers) {
+  $.get('/api/markers', (markers) => {
     initLayers(markers);
    // showMarkers(markers);
   })
@@ -163,7 +163,7 @@ function popupContent (marker, mode) {
   let buttons = `<button class="edit btn">Edit</button><button class="delete btn">Delete</button>`;
 
   if (mode === 'update') {
-    buttons = `<button class ="update">Save Changes</button>`;
+    buttons = `<button class="update">Save Changes</button>`;
     isDisabled = false;
   } else if (mode == 'create') {
     buttons = `<input type="button" value="Add Location" onclick=saveData() />`;
@@ -227,18 +227,17 @@ function onMapClick(e) {
 
 
 function saveData() {
-  let currentMarker = {}
-  currentMarker.title = document.getElementById('titleTbx').value;
-  currentMarker.description = document.getElementById('descriptionTbx').value;
-  currentMarker.author = document.getElementById('authorTbx').value;
-  currentMarker.asset = document.getElementById('assetSelect').value;
+  const currentMarker = {
+    title: document.getElementById('titleTbx').value,
+    description: document.getElementById('descriptionTbx').value,
+    author: document.getElementById('authorTbx').value,
+    asset: document.getElementById('assetSelect').value,
+    coordinates: [latLng.lng, latLng.lat],
+  }
 
-  currentMarker.coordinates = [latLng.lng, latLng.lat]
-
-  requestBody = currentMarker
-  $.post('api/markers', requestBody, function (data) {
+  $.post('api/markers', currentMarker, (data) => {
     addLayer(data);
-  })
+  });
 
   clearTextBoxAndClosePopup();
 }
@@ -252,20 +251,19 @@ function clearTextBoxAndClosePopup() {
 }
 
 function onPopupOpen(e) {
-  let marker = this;
-  let marker_id = marker._id;
+  const marker = this;
+  const marker_id = marker._id;
   // To remove marker on click of delete
-  $(".delete").on("click", function () {
+  $(".delete").on("click", () => {
     //can update confirm default box with bootstrap modal
     let confirmDelete = confirm("Are you sure you want to delete this marker?");
     if (confirmDelete) {
-      console.log(`/api/markers/${marker_id}`);
       $.ajax({
         url: `/api/markers/${marker_id}`,
         type: 'DELETE',
-        success: function (response) {
+        success: (response) => {
           console.log("Succesfully delete marker");
-          let leaflet_id = marker._leaflet_id
+          let leaflet_id = marker._leaflet_id;
           let layer = layers[marker.properties.asset];
           //Have to do this extra step to delete the marker reference that is inside the layer group
           delete layer._layers[leaflet_id];
@@ -276,15 +274,18 @@ function onPopupOpen(e) {
     }
   });
   // To update marker
-  $(".edit").on("click", function () {
+  $(".edit").on("click", () => {
     const previous_content = marker._popup.getContent();
     marker._popup.setContent(popupContent(marker, 'update'));
 
-    marker.on('popupclose', function (e) {
+    marker.on('popupclose', (e) => {
+      console.log('close popup');
+      // marker._popup.setContent(popupContent(marker, 'add'));
       marker._popup.setContent(previous_content);
     });
 
-    $(".update").on("click", function () {
+    $(".update").on("click", () => {
+      console.log('save changes', marker);
       const updatedProperties = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,

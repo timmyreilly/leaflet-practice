@@ -1,0 +1,32 @@
+.layer-toggle {
+    display: none;
+}
+  
+.layer-panel {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  padding: 12px;
+  background: #fff;
+  opacity: 0.7;
+  z-index: 1000;
+  color: #2574A9;
+  text-transform: uppercase;
+  }
+
+.layer-panel-content > h3 {
+  text-align: center;
+  margin: 0 auto;
+  }
+  
+.layer-button {
+  color: grey;
+  border-top: 1px solid #2574A9;
+  padding: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+div.toggle-active {
+  color: #2574A9;
+}

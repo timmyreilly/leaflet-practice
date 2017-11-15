@@ -1,3 +1,37 @@
+/* ----------STYLES---------*/
+body {
+  margin: 0;
+  /*Added height calc to remove scrolling*/
+  height: calc(100% - 50px); /* minus navbar incl. border */
+  font-family: 'Nunito', sans-serif;
+}
+
+html{
+  height: 100%;
+}
+
+.btn{
+  border-style: solid;
+  border-radius: 3px;
+  border-width: thin;
+  border-color: #ccc;
+}
+
+
+/* ----------NAVIGATION---------*/
+.navbar{
+  padding: 0 10px;
+  margin: 0px !important;
+  color: #2574A9;
+}
+
+.navbar-brand{
+  font-size: 24px;
+  color: #2574A9 !important;
+}
+
+
+/* ----------LAYER PANEL---------*/
 .layer-toggle {
     display: none;
 }
@@ -29,4 +63,23 @@
 
 div.toggle-active {
   color: #2574A9;
+}
+
+
+/* ---------LEAFLET MAP---------*/
+.map-holder{
+  position: relative;
+  background: #fff;
+}
+
+#mapid{
+  position: relative;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-popup-content{
+ font-size: 14px;
 }

@@ -163,7 +163,7 @@ function initmap() {
   let osm = new L.TileLayer(osmUrl, { minZoom: 8, maxZoom: 20, attribution: osmAttrib });
 
   // start the map in Northern San Francisco
-  map.setView(new L.LatLng(37.78, -122.44), 14);
+  map.setView(new L.LatLng(37.80, -122.42), 14);
   map.addLayer(osm);
 
   getMarkers();

@@ -1,0 +1,294 @@
+{
+	"info": {
+		"name": "ResiliencyDatasets",
+		"_postman_id": "9185c903-1307-a883-1d35-ac49431c0106",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Privately Owned Public Open Spaces (POPOS) ",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/3ub7-d4yy.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"3ub7-d4yy.geojson"
+					]
+				},
+				"description": "Privately-owned public open spaces (POPOS) are publicly accessible spaces in forms of plazas, terraces, atriums, small parks, and even snippets which are provided and maintained by private developers. In San Francisco, POPOS mostly appear in the Downtown office district area. "
+			},
+			"response": []
+		},
+		{
+			"name": "Park and Open Space Map",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"value": ""
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/94uf-amnx.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"94uf-amnx.geojson"
+					]
+				},
+				"description": "The following data-set is from the Recreation and Park Departments Master Property database. It list all Parks, Playgrounds, and Stadiums. This master list also contains the Park Service Area Manager along with their individual contact information.\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "San Francisco Seismic Hazard Zones",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "Application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/t2cc-dy6b.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"t2cc-dy6b.geojson"
+					]
+				},
+				"description": "This is a digital Seismic Hazard Zone Map presenting areas where liquefaction and landslides may occur during a strong earthquake. Three types of geological hazards, referred to as seismic hazard zones, may be featured on the map: 1) liquefaction, 2) earthquake-induced landslides, and 3) overlapping liquefaction and earthquake-induced landslides. Developers of properties falling within any of the three zones may be required to investigate the potential hazard and mitigate its threat during the local permitting process.\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Map of Schools",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/mmsr-vumy.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"mmsr-vumy.geojson"
+					]
+				},
+				"description": "Consolidated Infant, Pre-K, and K-14 education points for facilities both public and private.\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Map of Registered Business Locations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/vbiu-2p9h.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"vbiu-2p9h.geojson"
+					]
+				},
+				"description": "This dataset includes the locations of businesses that pay taxes to the City and County of San Francisco. Each registered business may have multiple locations and each location is a single row. The Treasurer & Tax Collector’s Office collects this data through business registration applications, account update/closure forms, and taxpayer filings. The data is collected to help enforce the Business and Tax Regulations Code including, but not limited to: Article 6, Article 12, Article 12-A, and Article 12-A-1. http://sftreasurer.org/registration\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Map of City Facilities",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/i5wr-crji.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"i5wr-crji.geojson"
+					]
+				},
+				"description": "City-owned and leased facilities maintained in the City's Facility System of Record (FSR). This dataset was developed through a process involving some of the primary stewards for the facility data and their stakeholders. It is meant to be a living reference and will be maintained and updated through established workflows and processes over time. You can access the User Guide on the source dataset https://data.sfgov.org/d/nc68-ngbr\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Care Facilities",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/sci7-7q9i.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"sci7-7q9i.geojson"
+					]
+				},
+				"description": "Health care facilities located in San Francisco\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Community Resiliency Indicator System",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/wsj2-27m9.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"wsj2-27m9.geojson"
+					]
+				},
+				"description": "The Community Resiliency Indicator System was developed by San Francisco's Climate and Health Program and is part of San Francisco's Climate and Health Profile. The system includes 40 indicators and an additive index which is a compilation of all of the indicators. See attached methods and project description documents for more details, you can also visit San Francisco's Climate and Health Profile website - www.sfclimatehealth.org (available Feb-2015)\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Pit Stop Locations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/snkr-6jdf.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"snkr-6jdf.geojson"
+					]
+				},
+				"description": "San Francisco Public Works operates the Pit Stop program, which provides clean and safe public toilets, sinks, used needle receptacles and dog waste stations in San Francisco's most impacted neighborhoods."
+			},
+			"response": []
+		},
+		{
+			"name": "SF Find Neighborhoods",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://data.sfgov.org/resource/6ia5-2f8k.geojson",
+					"protocol": "https",
+					"host": [
+						"data",
+						"sfgov",
+						"org"
+					],
+					"path": [
+						"resource",
+						"6ia5-2f8k.geojson"
+					]
+				},
+				"description": "Neighborhood boundaries that were defined in 2006 by the Mayor's Office of Neighborhood Services for use with the SF Find tool: http://propertymap.sfplanning.org/?name=sffind. All boundaries are for the purpose of defining general locations of neighborhoods for the SF FIND application only, and as such they are not \"hard\" lines of demarcation.\r\n"
+			},
+			"response": []
+		}
+	]
+}

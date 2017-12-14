@@ -1,7 +1,7 @@
 let map;
 let latLng;
 //represents assets
-const layers = {};
+let layers = {};
 
 //custom asset icons
 let suppliesIcon =  L.AwesomeMarkers.icon({
@@ -76,6 +76,24 @@ function getMarkers() {
   })
 }
 
+//retrieves a geoJSON feature of type FeatureCollection or Feature
+function getExternalGeoJSON(endpoint) {
+  return $.get(`/api/${endpoint}`).then(function(geoJSONFeature) {
+    return geoJSONFeature;
+  });
+}
+
+function getPostmanCollection(){
+  // Items are the basic unit for a Postman collection. You can think of them as corresponding to a single API endpoint. 
+  //Each Item has one request and may have multiple API responses associated with it.
+  $.get('/api/postmancollection', (collection) => {
+    const items = collection.item; //want collection.item which is an array of single API endpoints for each resource. Change "items" to "resource"?
+    items.forEach(function(item){
+      addExternalLayer(item);  
+    });
+  });
+}
+
 //should only be called when initializating map
 function initLayers(markers){
   markers.forEach(m => {
@@ -87,10 +105,25 @@ function initLayers(markers){
 function addLayer(marker){
   //add extra check to avoid redeclaring a layer group
   if (!layers[marker.asset]){
+    const isExternalLayer = false;
     layers[marker.asset] = L.layerGroup().addTo(map);
-    addLayerButton(marker.asset, getIcon(marker.asset).options.icon);
-   }
+    addLayerButton(marker.asset, getIcon(marker.asset).options.icon), isExternalLayer;
+  }
    showMarker(marker);
+}
+
+//Creates a geoJSON layer based on the item's(resource) shortName 
+function addExternalLayer(item){
+  const shortName = item.shortName;
+  if (!layers[shortName]){
+    const isExternalLayer = true;
+    //Don't want to add this layerGroup to the map yet until user requests data for this.
+    layers[shortName] = L.geoJSON();
+    layers[shortName].name = item.name;
+    layers[shortName].shortName = item.shortName;
+    layers[shortName].endpoint = item.endpoint;
+    addLayerButton(shortName, getIcon(item.shortName).options.icon, isExternalLayer);
+  } 
 }
 
 //Should we rename this function to addMarker(marker)?
@@ -102,33 +135,59 @@ function showMarker(marker) {
    x._id = marker._id;
    x.properties = marker;
    addPopup(x);
-   console.log(layers);
 }
 
 //Create a button to toggle the layer
-function addLayerButton(layerName, iconName){
-  //create button
-  let layerItem = document.createElement('div')
-  layerItem.innerHTML = `${layerName} <span class="fa fa-${iconName}"></span>`
-  layerItem.className = "layer-button"
-  layerItem.classList.add("toggle-active"); //layers are initially active
-  layerItem.setAttribute('ref', `${layerName}-toggle`) //will be used to toggle on mobile
-  layerItem.addEventListener('click', (e) => toggleMapLayer(layerName))
-  document.getElementById("layer-buttons").appendChild(layerItem);
-
-  function toggleMapLayer(layerName){
-    //Toggle active UI status
-    layerItem.classList.toggle('toggle-active')
-
-    const layer = layers[layerName];
-    if (map.hasLayer(layer)) {
-      map.removeLayer(layer)
-    } else {
-      map.addLayer(layer)
-    }
+function addLayerButton(layerName, iconName, isExternal){
+  let layerButton = createLayerButton(layerName, iconName);
+  layerButton.addEventListener('click', (e) => toggleMapLayer(layerButton, layerName,  isExternal));
+  if(isExternal){
+    document.getElementById("external-layer-buttons").appendChild(layerButton); 
+    //external layers are initially inactive
+  }else{
+    document.getElementById("layer-buttons").appendChild(layerButton);
+    layerButton.classList.add("toggle-active"); 
   }
 }
 
+function createLayerButton(layerName, iconName){
+  let layerDiv = document.createElement('div');
+  layerDiv.innerHTML = `${layerName} <span class="fa fa-${iconName}"></span>`;
+  layerDiv.className = "layer-button";
+  layerDiv.setAttribute('ref', `${layerName}-toggle`); //will be used to toggle on mobile
+  return layerDiv;
+}
+
+function toggleMapLayer(layerButton, layerName, isExternal){
+  const layer = layers[layerName];
+  if (isExternal && $.isEmptyObject(layer._layers)){ 
+    toggle(layer, layerButton);
+    //Disable clicks on the external layers until we have plotted the data?
+    getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
+      //adds features in the retrieved featureCollection to the layer. And for each feature we are adding a popup
+      layer.addData(featureCollection).eachLayer(function(layer){
+        if (layer.feature.properties){
+          layer.bindPopup(`${layer.feature.properties}`);
+        }
+      });
+    });
+  }
+  else{
+    toggle(layer, layerButton);
+  }
+
+  //Toggle active UI status and layer attached to the map
+ function toggle(layer, layerButton){
+  if (map.hasLayer(layer)){
+    map.removeLayer(layer);
+    layerButton.classList.remove('toggle-active');
+  }else{
+    map.addLayer(layer);
+    layerButton.classList.add('toggle-active');
+    }
+  }
+}
+ 
 function updateMarker(data, marker) {
   if (data) {
     marker.properties.asset = data.asset;
@@ -213,6 +272,7 @@ function initmap() {
   map.addLayer(osm);
 
   getMarkers();
+  getPostmanCollection();
 
   map.on('click', onMapClick);
 }
@@ -224,7 +284,6 @@ function onMapClick(e) {
     .setContent(popupContent(null, 'create'))
     .openOn(map);
 }
-
 
 function saveData() {
   const currentMarker = {

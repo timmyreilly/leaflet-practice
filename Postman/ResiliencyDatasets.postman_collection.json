@@ -8,6 +8,8 @@
 	"item": [
 		{
 			"name": "Privately Owned Public Open Spaces (POPOS) ",
+			"shortName": "Privately Owned Public Open Spaces",
+			"endpoint": "popos",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -34,8 +36,10 @@
 			},
 			"response": []
 		},
-		{
+		{	
 			"name": "Park and Open Space Map",
+			"shortName": "Park and Open Space",
+			"endpoint": "parkopenspace",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -68,6 +72,8 @@
 		},
 		{
 			"name": "San Francisco Seismic Hazard Zones",
+			"shortName": "Seismic Hazard Zones",
+			"endpoint": "seismiczones",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -96,6 +102,8 @@
 		},
 		{
 			"name": "Map of Schools",
+			"shortName": "Schools",
+			"endpoint": "schools",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -122,8 +130,10 @@
 			},
 			"response": []
 		},
-		{
+		{	
 			"name": "Map of Registered Business Locations",
+			"shortName": "Business Locations",
+			"endpoint": "businesslocs",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -152,6 +162,8 @@
 		},
 		{
 			"name": "Map of City Facilities",
+			"shortName": "City Facilities",
+			"endpoint": "cityfacilities",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -180,6 +192,8 @@
 		},
 		{
 			"name": "Health Care Facilities",
+			"shortName": "Health Care Facilities",
+			"endpoint": "healthcarefacilities",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -208,6 +222,8 @@
 		},
 		{
 			"name": "Community Resiliency Indicator System",
+			"shortName": "Community Resiliency Indicator System",
+			"endpoint": "commresindicator",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -236,6 +252,8 @@
 		},
 		{
 			"name": "Pit Stop Locations",
+			"shortName": "Pit Stop Locations",
+			"endpoint": "pitstop",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -264,6 +282,8 @@
 		},
 		{
 			"name": "SF Find Neighborhoods",
+			"shortName": "SF Find Neighborhoods",
+			"endpoint": "sffindneighborhoods",
 			"request": {
 				"method": "GET",
 				"header": [

@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const GeoJSON = require('geojson');
-const Marker = require('../../models/markerModel.js')
+const Marker = require('../../models/markerModel.js');
+const request = require('request');
+const postmanCollection = require("../../Postman/ResiliencyDatasets.postman_collection.json");
 
 router.route('/markers')
   .post((req, res) => {
@@ -118,6 +120,90 @@ router.route('/geojson').get((req, res) => {
     }
   })
 });
+
+//Routes to expose GEOJSON data from SF Gov endpoints
+// Privately Owned Public Open Spaces (POPOS)
+router.get('/popos', (req, res) => {
+  request('https://data.sfgov.org/resource/3ub7-d4yy.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  })
+})
+
+// Park and Open Space Map
+router.get('/parkopenspace', (req, res) => {
+  request('https://data.sfgov.org/resource/94uf-amnx.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+// San Francisco Seismic Hazard Zones
+router.get('/seismiczones', (req, res) => {
+  request('https://data.sfgov.org/resource/t2cc-dy6b.geojson', (error, response, body) =>{
+    res.send(JSON.parse(body));
+  });
+});
+
+// Map of Schools
+router.get('/schools', (req, res) => {
+  request('https://data.sfgov.org/resource/mmsr-vumy.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+// Map of Registered Business Locations
+router.get('/businesslocs', (req, res) => {
+  request('https://data.sfgov.org/resource/vbiu-2p9h.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+// Map of City Facilities
+router.get('/cityfacilities', (req, res) => {
+  request('https://data.sfgov.org/resource/i5wr-crji.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+// Health Care Facilities
+router.get('/healthcarefacilities', (req, res) => {
+  request('https://data.sfgov.org/resource/sci7-7q9i.geojson', (error, response, body) => {
+    res.send(JSON.parse(body))
+  });
+});
+
+// Community Resiliency Indicator System
+router.get('/commresindicator', (req, res) => {
+  request('https://data.sfgov.org/resource/wsj2-27m9.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+// Pit Stop Locations
+router.get('/pitstop', (req, res) => {
+  request('https://data.sfgov.org/resource/snkr-6jdf.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+// SF Find Neighborhoods
+router.get('/sffindneighborhoods', (req, res) => {
+  request('https://data.sfgov.org/resource/6ia5-2f8k.geojson', (error, response, body) => {
+    res.send(JSON.parse(body));
+  });
+});
+
+router.route('/postmancollection').get((req, res) => {
+  res.json(postmanCollection);
+});
+
+/*
+router.get('/postmancollection', (req, res) => {
+  res.send(JSON.parse(postmanCollection));
+});
+*/
+
+
+
 
 // Functionality we might want to use...
 

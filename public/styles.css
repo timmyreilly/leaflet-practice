@@ -59,10 +59,18 @@ html{
   padding: 6px;
   cursor: pointer;
   user-select: none;
+  position: relative;
 }
 
 div.toggle-active {
   color: #2574A9;
+}
+
+.layer-buttons{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  
 }
 
 

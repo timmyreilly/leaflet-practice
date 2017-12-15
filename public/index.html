@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./loader.css">
     
 </head>
 
@@ -46,13 +47,18 @@
     <div class="map-holder" style="height: 100%">
     <div id="mapid">
     </div>
-    <div ref="panel" class="layer-panel">
+    <div ref="panel" class="layer-panel">    
         <div ref="toggle" class="layer-toggle">Layers</div>
         <div class="layer-panel-content">
           <h3>Layers</h3>
           <div ref="buttons" id="layer-buttons" class="layer-buttons"></div>
           <h3>External layers</h3>
-          <div ref="buttons" id="external-layer-buttons" class="layer-buttons"></div>
+          <div ref="buttons" id="external-layer-buttons" class="layer-buttons">
+              <div id="loader" class="loading-overlay">
+                  <h4 class="mid-center">Loading</h4>
+                <div class="spin-loader"></div>
+              </div>
+          </div>
         </div>
     </div>
     </div>

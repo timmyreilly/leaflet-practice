@@ -9,50 +9,109 @@ let suppliesIcon =  L.AwesomeMarkers.icon({
   markerColor: 'gray',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
 let staffIcon =  L.AwesomeMarkers.icon({
   icon: 'users',
   markerColor: 'purple',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
 let foodIcon = L.AwesomeMarkers.icon({
   icon: 'cutlery',
   markerColor: 'green',
   prefix: 'fa',
   iconColor: 'black'
-  })
-
+})
 let waterIcon = L.AwesomeMarkers.icon({
   icon: 'tint',
   markerColor: 'blue',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
 let energyIcon = L.AwesomeMarkers.icon({
   icon: 'bolt',
   markerColor: 'orange',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
 let medicalIcon =  L.AwesomeMarkers.icon({
   icon: 'medkit',
   markerColor: 'red',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
 let openSpaceIcon =  L.AwesomeMarkers.icon({
   icon: 'tree',
   markerColor: 'green',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
 let shelterIcon = L.AwesomeMarkers.icon({
   icon: 'home',
   markerColor: 'blue',
   prefix: 'fa',
   iconColor: 'black'
-  })
+})
+let shieldIcon = L.AwesomeMarkers.icon({
+  icon: 'shield',
+  markerColor: 'pink',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let warningIcon = L.AwesomeMarkers.icon({
+  icon: 'warning',
+  markerColor: 'red',
+  prefix: 'fa',
+  iconColor: 'white'
+})
+let schoolIcon = L.AwesomeMarkers.icon({
+  icon: 'graduation-cap',
+  markerColor: 'purple',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let businessIcon = L.AwesomeMarkers.icon({
+  icon: 'building',
+  markerColor: 'white',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let cityHallIcon = L.AwesomeMarkers.icon({
+  icon: 'university',
+  markerColor: 'orange',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let healthCareIcon = L.AwesomeMarkers.icon({
+  icon: 'ambulance',
+  markerColor: 'white',
+  prefix: 'fa',
+  iconColor: 'red'
+})
+let bathIcon = L.AwesomeMarkers.icon({
+  icon: 'bath',
+  markerColor: 'blue',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let mapSignsIcon = L.AwesomeMarkers.icon({
+  icon: 'map-signs',
+  markerColor: 'blue',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let superPowersIcon = L.AwesomeMarkers.icon({
+  icon: 'superpowers',
+  markerColor: 'pink',
+  prefix: 'fa',
+  iconColor: 'black'
+})
+let markerIcon = L.AwesomeMarkers.icon({
+  icon: 'map-marker',
+  markerColor: 'blue',
+  prefix: 'fa',
+  iconColor: 'black'
+})
 
 function getIcon(layerName) {
   let icons = {
@@ -64,11 +123,28 @@ function getIcon(layerName) {
     "medical": medicalIcon,
     "open space": openSpaceIcon,
     "shelter": shelterIcon,
-    'default': suppliesIcon
+    "Privately Owned Public Open Spaces": shieldIcon,
+    "Park and Open Space": openSpaceIcon,
+    "Seismic Hazard Zones": warningIcon,
+    "Schools": schoolIcon,
+    "Business Locations": businessIcon,
+    "City Facilities": cityHallIcon,
+    "Health Care Facilities": healthCareIcon,
+    "Community Resiliency Indicator System": superPowersIcon,
+    "Pit Stop Locations": bathIcon,
+    "SF Find Neighborhoods": mapSignsIcon,
+    'default': markerIcon,
   }
   return (icons[layerName] || icons["default"]);
 }
 
+function getPolylinesStyle(layerName) {
+  let styles = {
+    "Seismic Hazard Zones": { "color": "red","opacity": 0.65 },
+    'default': {color :'blue', "opacity": 0.5},
+  }
+  return (styles[layerName] || styles["default"]);
+}
 
 let loader = {
   show: function(){
@@ -82,7 +158,6 @@ let loader = {
 function getMarkers() {
   $.get('/api/markers', (markers) => {
     initLayers(markers);
-   // showMarkers(markers);
   })
 }
 
@@ -120,7 +195,7 @@ function addLayer(marker){
     layers[marker.asset] = L.layerGroup().addTo(map);
     addLayerButton(marker.asset, getIcon(marker.asset).options.icon), isExternalLayer;
   }
-   showMarker(marker);
+   addMarker(marker);
 }
 
 //Creates a geoJSON layer based on the item's(resource) shortName 
@@ -130,16 +205,15 @@ function addExternalLayer(item){
     const isExternalLayer = true;
     //Don't want to add this layerGroup to the map yet until user requests data for this.
     layers[shortName] = L.geoJSON();
-    layers[shortName].name = item.name;
+    layers[shortName].name = item.name; //Do we need to keep this information?
     layers[shortName].shortName = item.shortName;
     layers[shortName].endpoint = item.endpoint;
     addLayerButton(shortName, getIcon(item.shortName).options.icon, isExternalLayer);
   } 
 }
 
-//Should we rename this function to addMarker(marker)?
 // add the marker to a layer group + put popup content on each marker
-function showMarker(marker) {
+function addMarker(marker) {
    const customIcon = getIcon(marker.asset);
    const x = L.marker([marker.coordinates[1], marker.coordinates[0]], {icon:customIcon});
    layers[marker.asset].addLayer(x);
@@ -168,34 +242,41 @@ function createLayerButton(layerName, iconName){
   layerDiv.setAttribute('ref', `${layerName}-toggle`); //will be used to toggle on mobile
   return layerDiv;
 }
+//Need to be completed. Currently popups are showing [Object object]
+function addExternalLayerPopup(feature,layer){
+  if (feature.feature.properties){
+    layer.bindPopup(`${feature.feature.properties}`);
+  }
+}
 
 function toggleMapLayer(layerButton, layerName, isExternal){
-  const layer = layers[layerName];
+  let layer = layers[layerName];
   if (isExternal && $.isEmptyObject(layer._layers)){ 
-    toggle(layer, layerButton);
     loader.show();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
-      loader.hide();
-      //adds features in the retrieved featureCollection to the layer. And for each feature we are adding a popup
-      layer.addData(featureCollection).eachLayer(function(layer){
-        if (layer.feature.properties){
-          layer.bindPopup(`${layer.feature.properties}`);
-        }
+      layer.addData(featureCollection);
+      layer.eachLayer(function(feature){
+        let geometryType = feature.feature.geometry.type;
+        if (geometryType === "Point") feature.setIcon(getIcon(layerName));
+        if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName)); 
+        addExternalLayerPopup(feature,layer); 
       });
-    });
+      loader.hide();
+    }); 
+    toggle(layer, layerButton);
   }
   else{
     toggle(layer, layerButton);
   }
-
-   //Toggle active UI status and layer attached to the map
+  
+ //Toggle active UI status and layer attached to the map
  function toggle(layer, layerButton){
   if (map.hasLayer(layer)){
-    map.removeLayer(layer);
-    layerButton.classList.remove('toggle-active');
+      map.removeLayer(layer);
+      layerButton.classList.remove('toggle-active');
   }else{
     map.addLayer(layer);
-    layerButton.classList.add('toggle-active');
+      layerButton.classList.add('toggle-active');
     }
   }
 }

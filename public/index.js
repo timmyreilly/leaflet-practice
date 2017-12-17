@@ -170,12 +170,12 @@ function getExternalGeoJSON(endpoint) {
 }
 
 function getPostmanCollection(){
-  // Items are the basic unit for a Postman collection. You can think of them as corresponding to a single API endpoint. 
+  // Items are the basic unit for a Postman collection. You can think of them as corresponding to a single API endpoint.
   //Each Item has one request and may have multiple API responses associated with it.
   $.get('/api/postmancollection', (collection) => {
     const items = collection.item; //want collection.item which is an array of single API endpoints for each resource. Change "items" to "resource"?
     items.forEach(function(item){
-      addExternalLayer(item);  
+      addExternalLayer(item);
     });
   });
 }
@@ -198,7 +198,7 @@ function addLayer(marker){
    addMarker(marker);
 }
 
-//Creates a geoJSON layer based on the item's(resource) shortName 
+//Creates a geoJSON layer based on the item's(resource) shortName
 function addExternalLayer(item){
   const shortName = item.shortName;
   if (!layers[shortName]){
@@ -209,7 +209,7 @@ function addExternalLayer(item){
     layers[shortName].shortName = item.shortName;
     layers[shortName].endpoint = item.endpoint;
     addLayerButton(shortName, getIcon(item.shortName).options.icon, isExternalLayer);
-  } 
+  }
 }
 
 // add the marker to a layer group + put popup content on each marker
@@ -227,11 +227,11 @@ function addLayerButton(layerName, iconName, isExternal){
   let layerButton = createLayerButton(layerName, iconName);
   layerButton.addEventListener('click', (e) => toggleMapLayer(layerButton, layerName,  isExternal));
   if(isExternal){
-    document.getElementById("external-layer-buttons").appendChild(layerButton); 
+    document.getElementById("external-layer-buttons").appendChild(layerButton);
     //external layers are initially inactive
   }else{
     document.getElementById("layer-buttons").appendChild(layerButton);
-    layerButton.classList.add("toggle-active"); 
+    layerButton.classList.add("toggle-active");
   }
 }
 
@@ -251,24 +251,24 @@ function addExternalLayerPopup(feature,layer){
 
 function toggleMapLayer(layerButton, layerName, isExternal){
   let layer = layers[layerName];
-  if (isExternal && $.isEmptyObject(layer._layers)){ 
+  if (isExternal && $.isEmptyObject(layer._layers)){
     loader.show();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
       layer.addData(featureCollection);
       layer.eachLayer(function(feature){
         let geometryType = feature.feature.geometry.type;
         if (geometryType === "Point") feature.setIcon(getIcon(layerName));
-        if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName)); 
-        addExternalLayerPopup(feature,layer); 
+        if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
+        addExternalLayerPopup(feature,layer);
       });
       loader.hide();
-    }); 
+    });
     toggle(layer, layerButton);
   }
   else{
     toggle(layer, layerButton);
   }
-  
+
  //Toggle active UI status and layer attached to the map
  function toggle(layer, layerButton){
   if (map.hasLayer(layer)){

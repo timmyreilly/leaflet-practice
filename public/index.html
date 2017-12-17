@@ -22,51 +22,35 @@
 </head>
 
 <body>
-  <header class="navbar navbar-default navbar-static-top">
-    <!-- Brand and toggle get grouped for better mobile display -->
+  <header class="navbar">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>        
-        <span class="icon-bar"></span>                        
-      </button>
-      <a class="navbar-brand" href="">RESILIENCY MAP SF</a>
-      </div>
-      <div class="collapse navbar-collapse" id="myNavbar">
-        <ul class="nav navbar-nav navbar-right">
-              <!--
-            <li><a href="#">Placeholder</a></li>
-            <li><a href="#">Placeholder</a></li>
-            <li><a href="#">Placeholder</a></li>
-              -->
-          </ul>
-        </div><!-- end navbar-collapse -->  
-    </header>
+      <a class="navbar-brand">RESILIENCY MAP SF</a>
+    </div>
+  </header>
 
-    <div class="map-holder" style="height: 100%">
+  <div class="map-holder" style="height: 100%">
     <div id="mapid">
     </div>
-    <div ref="panel" class="layer-panel">    
-        <div ref="toggle" class="layer-toggle">Layers</div>
-        <div class="layer-panel-content">
-          <h3>Layers</h3>
-          <div ref="buttons" id="layer-buttons" class="layer-buttons"></div>
-          <h3>External layers</h3>
-          <div ref="buttons" id="external-layer-buttons" class="layer-buttons">
-              <div id="loader" class="loading-overlay">
-                  <h4 class="mid-center">Loading</h4>
-                <div class="spin-loader"></div>
-              </div>
-          </div>
+    <div ref="panel" class="layer-panel">
+      <div ref="toggle" class="layer-toggle">Layers</div>
+      <div class="layer-panel-content">
+        <h3>Layers</h3>
+        <div ref="buttons" id="layer-buttons" class="layer-buttons"></div>
+        <h3>External layers</h3>
+        <div ref="buttons" id="external-layer-buttons" class="layer-buttons">
+            <div id="loader" class="loading-overlay">
+                <h4 class="mid-center">Loading</h4>
+            <div class="spin-loader"></div>
+            </div>
         </div>
+      </div>
     </div>
-    </div>
-    
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
-        crossorigin=""></script>
-    <script src="./leaflet.awesome-markers.js"></script>
-    <script type='text/javascript' src='/index.js'></script>
-</body>
+  </div>
 
+  <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+      crossorigin=""></script>
+  <script src="./leaflet.awesome-markers.js"></script>
+  <script type='text/javascript' src='/index.js'></script>
+</body>
 </html>

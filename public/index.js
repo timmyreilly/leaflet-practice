@@ -161,8 +161,6 @@ function getMarkers() {
 }
 //Functions to show and add hide info container
 function showInfo(){
-  console.log('showing')
-  console.log(this)
   if(this.properties){
     $(".infoBody").text(
       `Title: ${this.properties.title}
@@ -175,7 +173,6 @@ function showInfo(){
   $(".infoContainer").show();
 };
 function hideInfo(){
-  console.log('hiding')
   $(".infoContainer").hide();
 };
 
@@ -261,15 +258,17 @@ function createLayerButton(layerName, iconName){
   return layerDiv;
 }
 
-function addExternalLayerPopup(feature,layer){
-  // let geometryType = feature.geometry.type;
-  // // console.log(layerName)
-  // if (geometryType === "Point") layer.setIcon(getIcon(layerName));
-  // if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
+//Called on each GEOJSON feature before adding to Map
+function onEachFeature(feature,layer){
   if (feature.properties){
     layer.bindPopup(`${feature.properties.descriptio}`);
     layer.on('mouseover', showInfo);
     layer.on("mouseout", hideInfo)
+    let geometryType = feature.geometry.type;
+    let layerName = feature.properties.layerName
+    let icon = getIcon(layerName)
+    if (geometryType === "Point") layer.setIcon(icon)
+    if (geometryType === "MultiPolygon") layer.setStyle(getPolylinesStyle(layerName)); // NOT CURRENTLY WORKING
   }
 }
 
@@ -280,17 +279,14 @@ function toggleMapLayer(layerButton, layerName, isExternal){
   if (isExternal && $.isEmptyObject(layer._layers)){
     loader.show();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
+      var geoJsonLayer = L.geoJSON(featureCollection, {
+        //Using pointToLayer to add name of Layer on each feature so we can grab it later --NOT CURRENTLY WORKING WITH POLYGONS--
+        pointToLayer: function(feature, latlng) {
+          feature.properties.layerName = layerName
+        }
+      })
+    L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
 
-      // layer.addData(featureCollection);
-      // layer.eachLayer(function(feature){
-      //   // console.log(feature._leaflet_id)
-        // console.log(feature)
-        // let geometryType = feature.feature.geometry.type;
-        // if (geometryType === "Point") feature.setIcon(getIcon(layerName));
-        // if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
-      //   addExternalLayerPopup(feature,layer);
-      // });
-      L.geoJSON(featureCollection ,{onEachFeature: addExternalLayerPopup}).addTo(map);
       loader.hide();
     });
     toggle(layer, layerButton);

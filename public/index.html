@@ -9,59 +9,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://use.fontawesome.com/3758da217b.js"></script>
-
     <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
     <link rel="stylesheet" href="./leaflet.awesome-markers.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
         crossorigin="" />
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
-    
+    <link rel="stylesheet" href="./loader.css">
+
 </head>
 
 <body>
-  <header class="navbar navbar-default navbar-static-top">
-    <!-- Brand and toggle get grouped for better mobile display -->
+  <header class="navbar">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>        
-        <span class="icon-bar"></span>                        
-      </button>
-      <a class="navbar-brand" href="">RESILIENCY MAP SF</a>
-      </div>
-      <div class="collapse navbar-collapse" id="myNavbar">
-        <ul class="nav navbar-nav navbar-right">
-              <!--
-            <li><a href="#">Placeholder</a></li>
-            <li><a href="#">Placeholder</a></li>
-            <li><a href="#">Placeholder</a></li>
-              -->
-          </ul>
-        </div><!-- end navbar-collapse -->  
-    </header>
+      <a class="navbar-brand">RESILIENCY MAP SF</a>
+    </div>
+  </header>
 
-    <div class="map-holder" style="height: 100%">
+  <div class="map-holder" style="height: 100%">
     <div id="mapid">
     </div>
     <div ref="panel" class="layer-panel">
-        <div ref="toggle" class="layer-toggle">Layers</div>
-        <div class="layer-panel-content">
-          <h3>Layers</h3>
-          <div ref="buttons" id="layer-buttons" class="layer-buttons"></div>
-          <h3>External layers</h3>
-          <div ref="buttons" id="external-layer-buttons" class="layer-buttons"></div>
+      <div ref="toggle" class="layer-toggle">Layers</div>
+      <div class="layer-panel-content">
+        <h3>Layers</h3>
+        <div ref="buttons" id="layer-buttons" class="layer-buttons"></div>
+        <h3>External layers</h3>
+        <div ref="buttons" id="external-layer-buttons" class="layer-buttons">
+            <div id="loader" class="loading-overlay">
+                <h4 class="mid-center">Loading</h4>
+            <div class="spin-loader"></div>
+            </div>
         </div>
+      </div>
     </div>
-    </div>
-    
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
-        crossorigin=""></script>
-    <script src="./leaflet.awesome-markers.js"></script>
-    <script type='text/javascript' src='/index.js'></script>
-</body>
+  </div>
 
+  <!-- Additional info window displayed in bottom left of screen that is toggled on mouseover of markers -->
+  <div class="infoContainer">
+    <div class="infoBody">
+      <div class="infoTitle"><strong>Name:</strong></div>
+      <div class="infoAddress"><em>Location</em></div>
+      <div class="infoHours"></div>
+      <div class="infoAdditional"></div>
+    </div>
+  </div>
+  <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+      crossorigin=""></script>
+  <script src="./leaflet.awesome-markers.js"></script>
+  <!-- Contains custom definitions for our markers -->
+  <script src ="./icons.js"></script>
+  <script type='text/javascript' src='/index.js'></script>
+
+</body>
 </html>

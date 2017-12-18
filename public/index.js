@@ -3,93 +3,97 @@ let latLng;
 //represents assets
 let layers = {};
 
-//custom asset icons
-let suppliesIcon =  L.AwesomeMarkers.icon({
-  icon: 'pencil',
-  markerColor: 'gray',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
-let staffIcon =  L.AwesomeMarkers.icon({
-  icon: 'users',
-  markerColor: 'purple',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
-let foodIcon = L.AwesomeMarkers.icon({
-  icon: 'cutlery',
-  markerColor: 'green',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
 
-let waterIcon = L.AwesomeMarkers.icon({
-  icon: 'tint',
-  markerColor: 'blue',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
-let energyIcon = L.AwesomeMarkers.icon({
-  icon: 'bolt',
-  markerColor: 'orange',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
-let medicalIcon =  L.AwesomeMarkers.icon({
-  icon: 'medkit',
-  markerColor: 'red',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
-let openSpaceIcon =  L.AwesomeMarkers.icon({
-  icon: 'tree',
-  markerColor: 'green',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
-let shelterIcon = L.AwesomeMarkers.icon({
-  icon: 'home',
-  markerColor: 'blue',
-  prefix: 'fa',
-  iconColor: 'black'
-  })
 
-function getIcon(layerName) {
-  let icons = {
-    "supplies": suppliesIcon,
-    "staff": staffIcon,
-    "food": foodIcon,
-    "water": waterIcon,
-    "energy or fuel": energyIcon,
-    "medical": medicalIcon,
-    "open space": openSpaceIcon,
-    "shelter": shelterIcon,
-    'default': suppliesIcon
+function getPolylinesStyle(layerName) {
+  let styles = {
+    "Seismic Hazard Zones": { "color": "red","opacity": 0.65 },
+    'default': {color :'blue', "opacity": 0.5},
   }
-  return (icons[layerName] || icons["default"]);
+  return (styles[layerName] || styles["default"]);
+}
+
+let loader = {
+  show: function(){
+    document.getElementById("loader").style.display = 'block';
+  },
+  hide: function(){
+    document.getElementById("loader").style.display = 'none';
+  }
 }
 
 function getMarkers() {
   $.get('/api/markers', (markers) => {
     initLayers(markers);
-   // showMarkers(markers);
   })
 }
 
+//Functions to show and add hide info container
+function showInfo(){
+  if(this.properties){
+    $(".infoTitle").text(`Title: ${this.properties.title}`)
+    $(".infoAddress").text(`Description: ${this.properties.description}`)
+    $(".infoAdditional").text(`Author: ${this.properties.author}`)
+  } else if (this.feature.properties){
+      $(".infoAdditional").text('')
+      let featureProps = this.feature.properties
+      switch(featureProps.layerName){
+        case "Privately Owned Public Open Spaces":
+          $(".infoTitle").text(`Name: ${featureProps.name}`);
+          $(".infoAddress").text(`Location: ${featureProps.location}`);
+          $(".infoAdditional").text(`Description: ${featureProps.descriptio}`);
+          break;
+        case "Park and Open Space":
+          $(".infoTitle").text(`Name: ${featureProps.parkname}`);
+          break;
+        case "Schools":
+          $(".infoTitle").text(`Campus Name: ${featureProps.campus_name}`)
+          $(".infoAddress").text(`Address: ${featureProps.campus_address}`);
+          break;
+        case "Business Locations":
+          $(".infoTitle").text(`Business Name: ${featureProps.dba_name}`);
+          $(".infoAdditional").text(`Classification: ${featureProps.naic_code_description}`);
+          break;
+        case "City Facilities":
+          $(".infoTitle").text(`Common Name: ${featureProps.common_name}`);
+          $(".infoAddress").text(`Address: ${featureProps.address}`);
+          $(".infoAdditional").text(`Dept Name: ${featureProps.department_name}`);
+          break;
+        case "Health Care Facilities":
+          $(".infoTitle").text(`Name: ${featureProps.facility_name}`);
+          $(".infoAddress").text(`Address: ${featureProps.location_address}`);
+          break;
+        case "Pit Stop Locations":
+          $(".infoTitle").text(`Facility Type: ${featureProps.facilitytype}`);
+          $(".infoAddress").text(`Location: ${featureProps.location}`);
+          $(".infoAdditional").text(`Hours: ${featureProps.hoursofoperation}`);
+          break;
+        default:
+          $(".infoBody").text('');
+        }
+      }
+  $(".infoContainer").show();
+};
+
+function hideInfo(){
+  $(".infoContainer").hide();
+};
+
 //retrieves a geoJSON feature of type FeatureCollection or Feature
 function getExternalGeoJSON(endpoint) {
+  console.log(`Called ${endpoint} API`);
   return $.get(`/api/${endpoint}`).then(function(geoJSONFeature) {
     return geoJSONFeature;
   });
 }
 
 function getPostmanCollection(){
-  // Items are the basic unit for a Postman collection. You can think of them as corresponding to a single API endpoint. 
+  // Items are the basic unit for a Postman collection. You can think of them as corresponding to a single API endpoint.
   //Each Item has one request and may have multiple API responses associated with it.
   $.get('/api/postmancollection', (collection) => {
     const items = collection.item; //want collection.item which is an array of single API endpoints for each resource. Change "items" to "resource"?
     items.forEach(function(item){
-      addExternalLayer(item);  
+      addExternalLayer(item);
     });
   });
 }
@@ -109,26 +113,25 @@ function addLayer(marker){
     layers[marker.asset] = L.layerGroup().addTo(map);
     addLayerButton(marker.asset, getIcon(marker.asset).options.icon), isExternalLayer;
   }
-   showMarker(marker);
+   addMarker(marker);
 }
 
-//Creates a geoJSON layer based on the item's(resource) shortName 
+//Creates a geoJSON layer based on the item's(resource) shortName
 function addExternalLayer(item){
   const shortName = item.shortName;
   if (!layers[shortName]){
     const isExternalLayer = true;
     //Don't want to add this layerGroup to the map yet until user requests data for this.
-    layers[shortName] = L.geoJSON();
-    layers[shortName].name = item.name;
+    layers[shortName] = L.geoJSON()
+    layers[shortName].name = item.name; //Do we need to keep this information?
     layers[shortName].shortName = item.shortName;
     layers[shortName].endpoint = item.endpoint;
     addLayerButton(shortName, getIcon(item.shortName).options.icon, isExternalLayer);
-  } 
+  }
 }
 
-//Should we rename this function to addMarker(marker)?
 // add the marker to a layer group + put popup content on each marker
-function showMarker(marker) {
+function addMarker(marker) {
    const customIcon = getIcon(marker.asset);
    const x = L.marker([marker.coordinates[1], marker.coordinates[0]], {icon:customIcon});
    layers[marker.asset].addLayer(x);
@@ -142,11 +145,11 @@ function addLayerButton(layerName, iconName, isExternal){
   let layerButton = createLayerButton(layerName, iconName);
   layerButton.addEventListener('click', (e) => toggleMapLayer(layerButton, layerName,  isExternal));
   if(isExternal){
-    document.getElementById("external-layer-buttons").appendChild(layerButton); 
+    document.getElementById("external-layer-buttons").appendChild(layerButton);
     //external layers are initially inactive
   }else{
     document.getElementById("layer-buttons").appendChild(layerButton);
-    layerButton.classList.add("toggle-active"); 
+    layerButton.classList.add("toggle-active");
   }
 }
 
@@ -158,36 +161,55 @@ function createLayerButton(layerName, iconName){
   return layerDiv;
 }
 
+//Called on each GEOJSON feature before adding to Map
+function onEachFeature(feature,layer){
+  if (feature.properties){
+    layer.bindPopup(`${feature.properties.descriptio}`);
+    layer.on('mouseover', showInfo);
+    layer.on("mouseout", hideInfo);
+    let geometryType = feature.geometry.type;
+    let layerName = feature.properties.layerName;
+    let icon = getIcon(layerName);
+    if (geometryType === "Point") layer.setIcon(icon);
+    if (geometryType === "MultiPolygon") layer.setStyle(getPolylinesStyle(layerName)); // NOT CURRENTLY WORKING
+  };
+};
+
+
+
 function toggleMapLayer(layerButton, layerName, isExternal){
-  const layer = layers[layerName];
-  if (isExternal && $.isEmptyObject(layer._layers)){ 
-    toggle(layer, layerButton);
-    //Disable clicks on the external layers until we have plotted the data?
+  layer = layers[layerName];
+  if (isExternal && $.isEmptyObject(layer._layers)){
+    loader.show();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
-      //adds features in the retrieved featureCollection to the layer. And for each feature we are adding a popup
-      layer.addData(featureCollection).eachLayer(function(layer){
-        if (layer.feature.properties){
-          layer.bindPopup(`${layer.feature.properties}`);
+      var geoJsonLayer = L.geoJSON(featureCollection, {
+        //Using pointToLayer to add name of Layer on each feature so we can grab it later --NOT CURRENTLY WORKING WITH POLYGONS--
+        pointToLayer: function(feature, latlng) {
+          feature.properties.layerName = layerName;
         }
-      });
+      })
+    L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
+
+      loader.hide();
     });
+    toggle(layer, layerButton);
   }
   else{
     toggle(layer, layerButton);
   }
 
-  //Toggle active UI status and layer attached to the map
+ //Toggle active UI status and layer attached to the map
  function toggle(layer, layerButton){
   if (map.hasLayer(layer)){
-    map.removeLayer(layer);
-    layerButton.classList.remove('toggle-active');
+      map.removeLayer(layer);
+      layerButton.classList.remove('toggle-active');
   }else{
     map.addLayer(layer);
-    layerButton.classList.add('toggle-active');
+      layerButton.classList.add('toggle-active');
     }
   }
 }
- 
+
 function updateMarker(data, marker) {
   if (data) {
     marker.properties.asset = data.asset;
@@ -198,11 +220,12 @@ function updateMarker(data, marker) {
   }
 }
 
-/*
-Adds html content to our popup marker
-*/
 function addPopup(marker) {
   if (marker) {
+    // Binds event listeners to markers that hide and show info window in bottom left on mouseover and mouseout
+    marker.on('mouseover', showInfo);
+    marker.on('mouseout', hideInfo);
+    //Adds html content to our popup marker
     marker.bindPopup(popupContent(marker, 'add'));
     marker.on('popupopen', onPopupOpen);
   }
@@ -230,13 +253,13 @@ function popupContent (marker, mode) {
   }
 
   const content = `
-    <table>
-      <tr><td colspan="2"></td></tr>
-      <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-      <tr><td>Description</td><td><input id="descriptionTbx" type="text" value="${description}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-      <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-      <tr><td>Asset</td>
-          <td>
+  <table>
+  <tr><td colspan="2"></td></tr>
+  <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+  <tr><td>Description</td><td><input id="descriptionTbx" type="text" value="${description}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+  <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+  <tr><td>Asset</td>
+      <td>
             <select id="assetSelect" ${isDisabled ? 'disabled' : ''}>
               <option ${asset === 'supplies' ? 'selected' : ''} value="supplies">Supplies</option>
               <option ${asset === 'staff' ? 'selected' : ''} value="staff">Staff</option>
@@ -246,15 +269,14 @@ function popupContent (marker, mode) {
               <option ${asset === 'medical' ? 'selected' : ''} value="medical">Medical</option>
               <option ${asset === 'open space' ? 'selected' : ''} value="open space">Open Space</option>
               <option ${asset === 'shelter' ? 'selected' : ''} value="shelter">Shelter</option>
-            </select></td>
-          </td>
-      </tr>
-    </table>
-    <div>
+              </select></td>
+              </td>
+          </tr>
+        </table>
+            <div>
       ${buttons}
     </div>
   `;
-
   return content;
 }
 
@@ -363,3 +385,7 @@ function onPopupOpen(e) {
 }
 
 initmap();
+
+$(document).ready(function(){
+  $(".infoContainer").hide();
+})

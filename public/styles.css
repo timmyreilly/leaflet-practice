@@ -93,9 +93,9 @@ div.toggle-active {
 }
 
 .infoContainer{
-  padding:100px;
-  width:50%;
-  height:100px;
+  padding:30px;
+  width:30%;
+  /* height:50px; */
   background: silver;
   position:fixed;
   bottom:0;

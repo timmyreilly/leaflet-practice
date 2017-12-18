@@ -162,7 +162,16 @@ function getMarkers() {
 //Functions to show and add hide info container
 function showInfo(){
   console.log('showing')
-  $(".infoBody").text(this.feature.properties.descriptio)
+  console.log(this)
+  if(this.properties){
+    $(".infoBody").text(
+      `Title: ${this.properties.title}
+      Description: ${this.properties.description}
+      Author: ${this.properties.author}
+    `)
+  } else if (this.feature.properties){
+    $(".infoBody").text(this.feature.properties.descriptio)
+  }
   $(".infoContainer").show();
 };
 function hideInfo(){

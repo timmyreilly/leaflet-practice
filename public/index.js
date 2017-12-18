@@ -159,6 +159,7 @@ function getMarkers() {
     initLayers(markers);
   })
 }
+
 //Functions to show and add hide info container
 function showInfo(){
   if(this.properties){
@@ -168,10 +169,36 @@ function showInfo(){
       Author: ${this.properties.author}
     `)
   } else if (this.feature.properties){
-    $(".infoBody").text(this.feature.properties.descriptio)
-  }
+      let featureProps = this.feature.properties
+      switch(featureProps.layerName){
+        case "Privately Owned Public Open Spaces":
+          $(".infoBody").text(`Name: ${featureProps.name} Location: ${featureProps.location} Description: ${featureProps.descriptio}`);
+          break;
+        case "Park and Open Space":
+          $(".infoBody").text(`Name: ${featureProps.parkname}`);
+          break;
+        case "Schools":
+          $(".infoBody").text(`Campus Name: ${featureProps.campus_name} Address: ${featureProps.campus_address}`);
+          break;
+        case "Business Locations":
+          $(".infoBody").text(`Business Name: ${featureProps.dba_name} Classification: ${featureProps.naic_code_description}`);
+          break;
+        case "City Facilities":
+          $(".infoBody").text(`Common Name: ${featureProps.common_name} Dept Name: ${featureProps.department_name} Address: ${featureProps.address}`);
+          break;
+        case "Health Care Facilities":
+          $(".infoBody").text(`Name: ${featureProps.facility_name} Address: ${featureProps.location_address}`);
+          break;
+        case "Pit Stop Locations":
+          $(".infoBody").text(`Facility Type: ${featureProps.facilitytype} Hours: ${featureProps.hoursofoperation} Location: ${featureProps.location}`)
+          break;
+        default:
+          $(".infoBody").text('');
+        }
+      }
   $(".infoContainer").show();
 };
+
 function hideInfo(){
   $(".infoContainer").hide();
 };
@@ -263,14 +290,14 @@ function onEachFeature(feature,layer){
   if (feature.properties){
     layer.bindPopup(`${feature.properties.descriptio}`);
     layer.on('mouseover', showInfo);
-    layer.on("mouseout", hideInfo)
+    layer.on("mouseout", hideInfo);
     let geometryType = feature.geometry.type;
-    let layerName = feature.properties.layerName
-    let icon = getIcon(layerName)
-    if (geometryType === "Point") layer.setIcon(icon)
+    let layerName = feature.properties.layerName;
+    let icon = getIcon(layerName);
+    if (geometryType === "Point") layer.setIcon(icon);
     if (geometryType === "MultiPolygon") layer.setStyle(getPolylinesStyle(layerName)); // NOT CURRENTLY WORKING
-  }
-}
+  };
+};
 
 
 
@@ -282,7 +309,7 @@ function toggleMapLayer(layerButton, layerName, isExternal){
       var geoJsonLayer = L.geoJSON(featureCollection, {
         //Using pointToLayer to add name of Layer on each feature so we can grab it later --NOT CURRENTLY WORKING WITH POLYGONS--
         pointToLayer: function(feature, latlng) {
-          feature.properties.layerName = layerName
+          feature.properties.layerName = layerName;
         }
       })
     L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
@@ -317,10 +344,6 @@ function updateMarker(data, marker) {
   }
 }
 
-
-
-
-
 function addPopup(marker) {
   if (marker) {
     // Binds event listeners to markers that hide and show info window in bottom left on mouseover and mouseout
@@ -331,7 +354,6 @@ function addPopup(marker) {
     marker.on('popupopen', onPopupOpen);
   }
 }
-
 
 function popupContent (marker, mode) {
   if (marker) {

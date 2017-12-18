@@ -31,34 +31,42 @@ function getMarkers() {
 //Functions to show and add hide info container
 function showInfo(){
   if(this.properties){
-    $(".infoBody").text(
-      `Title: ${this.properties.title}
-      Description: ${this.properties.description}
-      Author: ${this.properties.author}
-    `)
+    $(".infoTitle").text(`Title: ${this.properties.title}`)
+    $(".infoAddress").text(`Description: ${this.properties.description}`)
+    $(".infoAdditional").text(`Author: ${this.properties.author}`)
   } else if (this.feature.properties){
+      $(".infoAdditional").text('')
       let featureProps = this.feature.properties
       switch(featureProps.layerName){
         case "Privately Owned Public Open Spaces":
-          $(".infoBody").text(`Name: ${featureProps.name} Location: ${featureProps.location} Description: ${featureProps.descriptio}`);
+          $(".infoTitle").text(`Name: ${featureProps.name}`);
+          $(".infoAddress").text(`Location: ${featureProps.location}`);
+          $(".infoAdditional").text(`Description: ${featureProps.descriptio}`);
           break;
         case "Park and Open Space":
-          $(".infoBody").text(`Name: ${featureProps.parkname}`);
+          $(".infoTitle").text(`Name: ${featureProps.parkname}`);
           break;
         case "Schools":
-          $(".infoBody").text(`Campus Name: ${featureProps.campus_name} Address: ${featureProps.campus_address}`);
+          $(".infoTitle").text(`Campus Name: ${featureProps.campus_name}`)
+          $(".infoAddress").text(`Address: ${featureProps.campus_address}`);
           break;
         case "Business Locations":
-          $(".infoBody").text(`Business Name: ${featureProps.dba_name} Classification: ${featureProps.naic_code_description}`);
+          $(".infoTitle").text(`Business Name: ${featureProps.dba_name}`);
+          $(".infoAdditional").text(`Classification: ${featureProps.naic_code_description}`);
           break;
         case "City Facilities":
-          $(".infoBody").text(`Common Name: ${featureProps.common_name} Dept Name: ${featureProps.department_name} Address: ${featureProps.address}`);
+          $(".infoTitle").text(`Common Name: ${featureProps.common_name}`);
+          $(".infoAddress").text(`Address: ${featureProps.address}`);
+          $(".infoAdditional").text(`Dept Name: ${featureProps.department_name}`);
           break;
         case "Health Care Facilities":
-          $(".infoBody").text(`Name: ${featureProps.facility_name} Address: ${featureProps.location_address}`);
+          $(".infoTitle").text(`Name: ${featureProps.facility_name}`);
+          $(".infoAddress").text(`Address: ${featureProps.location_address}`);
           break;
         case "Pit Stop Locations":
-          $(".infoBody").text(`Facility Type: ${featureProps.facilitytype} Hours: ${featureProps.hoursofoperation} Location: ${featureProps.location}`)
+          $(".infoTitle").text(`Facility Type: ${featureProps.facilitytype}`);
+          $(".infoAddress").text(`Location: ${featureProps.location}`);
+          $(".infoAdditional").text(`Hours: ${featureProps.hoursofoperation}`);
           break;
         default:
           $(".infoBody").text('');

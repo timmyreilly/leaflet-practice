@@ -2,7 +2,6 @@ let map;
 let latLng;
 //represents assets
 let layers = {};
-
 //custom asset icons
 let suppliesIcon =  L.AwesomeMarkers.icon({
   icon: 'pencil',
@@ -160,6 +159,16 @@ function getMarkers() {
     initLayers(markers);
   })
 }
+//Functions to show and add hide info container
+function showInfo(){
+  console.log('showing')
+  $(".infoBody").text(this.feature.properties.descriptio)
+  $(".infoContainer").show();
+};
+function hideInfo(){
+  console.log('hiding')
+  $(".infoContainer").hide();
+};
 
 //retrieves a geoJSON feature of type FeatureCollection or Feature
 function getExternalGeoJSON(endpoint) {
@@ -204,7 +213,7 @@ function addExternalLayer(item){
   if (!layers[shortName]){
     const isExternalLayer = true;
     //Don't want to add this layerGroup to the map yet until user requests data for this.
-    layers[shortName] = L.geoJSON();
+    layers[shortName] = L.geoJSON()
     layers[shortName].name = item.name; //Do we need to keep this information?
     layers[shortName].shortName = item.shortName;
     layers[shortName].endpoint = item.endpoint;
@@ -242,25 +251,37 @@ function createLayerButton(layerName, iconName){
   layerDiv.setAttribute('ref', `${layerName}-toggle`); //will be used to toggle on mobile
   return layerDiv;
 }
-//Need to be completed. Currently popups are showing [Object object]
+
 function addExternalLayerPopup(feature,layer){
-  if (feature.feature.properties){
-    layer.bindPopup(`${feature.feature.properties}`);
+  // let geometryType = feature.geometry.type;
+  // // console.log(layerName)
+  // if (geometryType === "Point") layer.setIcon(getIcon(layerName));
+  // if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
+  if (feature.properties){
+    layer.bindPopup(`${feature.properties.descriptio}`);
+    layer.on('mouseover', showInfo);
+    layer.on("mouseout", hideInfo)
   }
 }
 
+
+
 function toggleMapLayer(layerButton, layerName, isExternal){
-  let layer = layers[layerName];
+  layer = layers[layerName];
   if (isExternal && $.isEmptyObject(layer._layers)){
     loader.show();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
-      layer.addData(featureCollection);
-      layer.eachLayer(function(feature){
-        let geometryType = feature.feature.geometry.type;
-        if (geometryType === "Point") feature.setIcon(getIcon(layerName));
-        if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
-        addExternalLayerPopup(feature,layer);
-      });
+
+      // layer.addData(featureCollection);
+      // layer.eachLayer(function(feature){
+      //   // console.log(feature._leaflet_id)
+        // console.log(feature)
+        // let geometryType = feature.feature.geometry.type;
+        // if (geometryType === "Point") feature.setIcon(getIcon(layerName));
+        // if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
+      //   addExternalLayerPopup(feature,layer);
+      // });
+      L.geoJSON(featureCollection ,{onEachFeature: addExternalLayerPopup}).addTo(map);
       loader.hide();
     });
     toggle(layer, layerButton);
@@ -291,15 +312,21 @@ function updateMarker(data, marker) {
   }
 }
 
-/*
-Adds html content to our popup marker
-*/
+
+
+
+
 function addPopup(marker) {
   if (marker) {
+    // Binds event listeners to markers that hide and show info window in bottom left on mouseover and mouseout
+    marker.on('mouseover', showInfo);
+    marker.on('mouseout', hideInfo);
+    //Adds html content to our popup marker
     marker.bindPopup(popupContent(marker, 'add'));
     marker.on('popupopen', onPopupOpen);
   }
 }
+
 
 function popupContent (marker, mode) {
   if (marker) {
@@ -455,3 +482,7 @@ function onPopupOpen(e) {
 }
 
 initmap();
+
+$(document).ready(function(){
+  $(".infoContainer").hide();
+})

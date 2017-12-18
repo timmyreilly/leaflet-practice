@@ -35,7 +35,7 @@ html{
 .layer-toggle {
     display: none;
 }
-  
+
 .layer-panel {
   position: absolute;
   top: 24px;
@@ -52,7 +52,7 @@ html{
   text-align: center;
   margin: 0 auto;
   }
-  
+
 .layer-button {
   color: grey;
   border-top: 1px solid #2574A9;
@@ -70,7 +70,7 @@ div.toggle-active {
   width: 100%;
   height: 100%;
   position: relative;
-  
+
 }
 
 
@@ -90,4 +90,15 @@ div.toggle-active {
 
 .leaflet-popup-content{
  font-size: 14px;
+}
+
+.infoContainer{
+  padding:100px;
+  width:50%;
+  height:100px;
+  background: silver;
+  position:fixed;
+  bottom:0;
+  border:1px solid black;
+  z-index:1000
 }

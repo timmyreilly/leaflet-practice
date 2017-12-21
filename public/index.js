@@ -188,7 +188,7 @@ function toggleMapLayer(layerButton, layerName, isExternal){
           feature.properties.layerName = layerName;
         }
       })
-    L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
+    layers[layerName] = L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
 
       loader.hide();
     });

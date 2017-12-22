@@ -69,6 +69,16 @@ function getIcon(layerName) {
   return (icons[layerName] || icons["default"]);
 }
 
+
+let loader = {
+  show: function(){
+    document.getElementById("loader").style.display = 'block';
+  },
+  hide: function(){
+    document.getElementById("loader").style.display = 'none';
+  }
+}
+
 function getMarkers() {
   $.get('/api/markers', (markers) => {
     initLayers(markers);
@@ -78,6 +88,7 @@ function getMarkers() {
 
 //retrieves a geoJSON feature of type FeatureCollection or Feature
 function getExternalGeoJSON(endpoint) {
+  console.log(`Called ${endpoint} API`);
   return $.get(`/api/${endpoint}`).then(function(geoJSONFeature) {
     return geoJSONFeature;
   });
@@ -162,8 +173,9 @@ function toggleMapLayer(layerButton, layerName, isExternal){
   const layer = layers[layerName];
   if (isExternal && $.isEmptyObject(layer._layers)){ 
     toggle(layer, layerButton);
-    //Disable clicks on the external layers until we have plotted the data?
+    loader.show();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
+      loader.hide();
       //adds features in the retrieved featureCollection to the layer. And for each feature we are adding a popup
       layer.addData(featureCollection).eachLayer(function(layer){
         if (layer.feature.properties){
@@ -176,7 +188,7 @@ function toggleMapLayer(layerButton, layerName, isExternal){
     toggle(layer, layerButton);
   }
 
-  //Toggle active UI status and layer attached to the map
+   //Toggle active UI status and layer attached to the map
  function toggle(layer, layerButton){
   if (map.hasLayer(layer)){
     map.removeLayer(layer);
@@ -187,7 +199,7 @@ function toggleMapLayer(layerButton, layerName, isExternal){
     }
   }
 }
- 
+
 function updateMarker(data, marker) {
   if (data) {
     marker.properties.asset = data.asset;
@@ -230,13 +242,13 @@ function popupContent (marker, mode) {
   }
 
   const content = `
-    <table>
-      <tr><td colspan="2"></td></tr>
-      <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-      <tr><td>Description</td><td><input id="descriptionTbx" type="text" value="${description}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-      <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-      <tr><td>Asset</td>
-          <td>
+  <table>
+  <tr><td colspan="2"></td></tr>
+  <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+  <tr><td>Description</td><td><input id="descriptionTbx" type="text" value="${description}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+  <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+  <tr><td>Asset</td>
+      <td>
             <select id="assetSelect" ${isDisabled ? 'disabled' : ''}>
               <option ${asset === 'supplies' ? 'selected' : ''} value="supplies">Supplies</option>
               <option ${asset === 'staff' ? 'selected' : ''} value="staff">Staff</option>
@@ -246,15 +258,14 @@ function popupContent (marker, mode) {
               <option ${asset === 'medical' ? 'selected' : ''} value="medical">Medical</option>
               <option ${asset === 'open space' ? 'selected' : ''} value="open space">Open Space</option>
               <option ${asset === 'shelter' ? 'selected' : ''} value="shelter">Shelter</option>
-            </select></td>
-          </td>
-      </tr>
-    </table>
-    <div>
+              </select></td>
+              </td>
+          </tr>
+        </table>
+            <div>
       ${buttons}
     </div>
   `;
-
   return content;
 }
 

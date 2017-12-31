@@ -1,4 +1,5 @@
 import markers from './markers';
+import { showLoader, hideLoader } from './loader';
 
 let map;
 let latLng;
@@ -11,15 +12,6 @@ function getPolylinesStyle(layerName) {
     'default': {color :'blue', "opacity": 0.5},
   }
   return (styles[layerName] || styles["default"]);
-}
-
-let loader = {
-  show: function(){
-    document.getElementById("loader").style.display = 'block';
-  },
-  hide: function(){
-    document.getElementById("loader").style.display = 'none';
-  }
 }
 
 function getMarkers() {
@@ -120,7 +112,7 @@ function addExternalLayerPopup(feature,layer){
 function toggleMapLayer(layerButton, layerName, isExternal){
   let layer = layers[layerName];
   if (isExternal && $.isEmptyObject(layer._layers)){
-    loader.show();
+    showLoader();
     getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
       layer.addData(featureCollection);
       layer.eachLayer(function(feature){
@@ -129,7 +121,7 @@ function toggleMapLayer(layerButton, layerName, isExternal){
         if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
         addExternalLayerPopup(feature,layer);
       });
-      loader.hide();
+      hideLoader();
     });
     toggle(layer, layerButton);
   }

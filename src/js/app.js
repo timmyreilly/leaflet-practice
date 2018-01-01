@@ -16,7 +16,6 @@ function getPolylinesStyle(layerName) {
 
 //retrieves a geoJSON feature of type FeatureCollection or Feature
 function getExternalGeoJSON(endpoint) {
-  console.log(`Called ${endpoint} API`);
   return $.get(`/api/${endpoint}`).then(function(geoJSONFeature) {
     return geoJSONFeature;
   });
@@ -224,7 +223,7 @@ function initmap() {
 
 function onMapClick(e) {
   const latLng = e.latlng;
-  console.log(e);
+
   const popup = L.popup()
     .setLatLng(latLng)
     .setContent(popupContent(null, 'create'))
@@ -271,7 +270,6 @@ function onPopupOpen(e) {
         url: `/api/markers/${marker_id}`,
         type: 'DELETE',
         success: (response) => {
-          console.log("Succesfully delete marker");
           let leaflet_id = marker._leaflet_id;
           let layer = layers[marker.properties.asset];
           //Have to do this extra step to delete the marker reference that is inside the layer group
@@ -288,13 +286,11 @@ function onPopupOpen(e) {
     marker._popup.setContent(popupContent(marker, 'update'));
 
     marker.on('popupclose', (e) => {
-      console.log('close popup');
       // marker._popup.setContent(popupContent(marker, 'add'));
       marker._popup.setContent(previous_content);
     });
 
     $(".update").on("click", () => {
-      console.log('save changes', marker);
       const updatedProperties = {
         title: document.getElementById('titleTbx').value,
         description: document.getElementById('descriptionTbx').value,

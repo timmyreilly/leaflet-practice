@@ -173,10 +173,10 @@ function popupContent (marker, mode) {
   let buttons = `<button class="edit btn">Edit</button><button class="delete btn">Delete</button>`;
 
   if (mode === 'update') {
-    buttons = `<button class="update">Save Changes</button>`;
+    buttons = `<button class="update btn">Save Changes</button>`;
     isDisabled = false;
   } else if (mode == 'create') {
-    buttons = `<input type="button" value="Add Location" onclick=saveData() />`;
+    buttons = `<button id="add-location" class="add btn">Add Location</button>`;
     isDisabled = false;
   }
 
@@ -233,6 +233,8 @@ function onMapClick(e) {
     .setLatLng(latLng)
     .setContent(popupContent(null, 'create'))
     .openOn(map);
+
+  document.getElementById('add-location').onclick = saveData;
 }
 
 function saveData() {

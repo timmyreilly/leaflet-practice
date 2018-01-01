@@ -3,7 +3,6 @@ import { getMarkers } from './api';
 import { showLoader, hideLoader } from './loader';
 
 let map;
-let latLng;
 //represents assets
 let layers = {};
 
@@ -224,25 +223,28 @@ function initmap() {
 }
 
 function onMapClick(e) {
-  latLng = e.latlng;
+  const latLng = e.latlng;
+  console.log(e);
   const popup = L.popup()
     .setLatLng(latLng)
     .setContent(popupContent(null, 'create'))
     .openOn(map);
 
-  document.getElementById('add-location').onclick = saveData;
+  document.getElementById('add-location').onclick = () => {
+    const marker = {
+      title: document.getElementById('titleTbx').value,
+      description: document.getElementById('descriptionTbx').value,
+      author: document.getElementById('authorTbx').value,
+      asset: document.getElementById('assetSelect').value,
+      coordinates: [latLng.lng, latLng.lat],
+    }
+
+    saveData(marker);
+  };
 }
 
-function saveData() {
-  const currentMarker = {
-    title: document.getElementById('titleTbx').value,
-    description: document.getElementById('descriptionTbx').value,
-    author: document.getElementById('authorTbx').value,
-    asset: document.getElementById('assetSelect').value,
-    coordinates: [latLng.lng, latLng.lat],
-  }
-
-  $.post('api/markers', currentMarker, (data) => {
+function saveData(marker) {
+  $.post('api/markers', marker, (data) => {
     addLayer(data);
   });
 

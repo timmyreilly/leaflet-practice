@@ -1,4 +1,5 @@
 import markers from './markers';
+import { getMarkers } from './api';
 import { showLoader, hideLoader } from './loader';
 
 let map;
@@ -12,12 +13,6 @@ function getPolylinesStyle(layerName) {
     'default': {color :'blue', "opacity": 0.5},
   }
   return (styles[layerName] || styles["default"]);
-}
-
-function getMarkers() {
-  $.get('/api/markers', (markers) => {
-    initLayers(markers);
-  })
 }
 
 //retrieves a geoJSON feature of type FeatureCollection or Feature
@@ -124,8 +119,7 @@ function toggleMapLayer(layerButton, layerName, isExternal){
       hideLoader();
     });
     toggle(layer, layerButton);
-  }
-  else{
+  }else{
     toggle(layer, layerButton);
   }
 
@@ -221,7 +215,9 @@ function initmap() {
   map.setView(new L.LatLng(37.80, -122.42), 14);
   map.addLayer(osm);
 
-  getMarkers();
+  getMarkers()
+    .then(markers => initLayers(markers));
+
   getPostmanCollection();
 
   map.on('click', onMapClick);

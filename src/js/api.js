@@ -1,4 +1,4 @@
-const BASE_URL = `http://localhost:8080/api`;
+const BASE_URL = `${window.location.origin}/api`;
 
 export function getMarkers() {
   return getJsonFromFetch(`${BASE_URL}/markers`);

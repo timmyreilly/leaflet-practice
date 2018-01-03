@@ -324,28 +324,31 @@ function popupContent (marker, mode) {
 
   const content = `
   <table>
-  <tr><td colspan="2"></td></tr>
-  <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-  <tr><td>Description</td><td><input id="descriptionTbx" type="text" value="${description}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-  <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
-  <tr><td>Asset</td>
+    <tr><td colspan="2"></td></tr>
+    <tr><td>Title</td><td><input id="titleTbx" type="text" value="${title}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+    <tr><td>Author</td><td><input id="authorTbx" type="text" value="${author}" ${isDisabled ? 'disabled' : ''} /></td></tr>
+    <tr>
+      <td>Asset</td>
       <td>
-            <select id="assetSelect" ${isDisabled ? 'disabled' : ''}>
-              <option ${asset === 'supplies' ? 'selected' : ''} value="supplies">Supplies</option>
-              <option ${asset === 'staff' ? 'selected' : ''} value="staff">Staff</option>
-              <option ${asset === 'food' ? 'selected' : ''} value="food">Food</option>
-              <option ${asset === 'water' ? 'selected' : ''} value="water">Water</option>
-              <option ${asset === 'energy or fuel' ? 'selected' : ''} value="energy or fuel">Energy/Fuel</option>
-              <option ${asset === 'medical' ? 'selected' : ''} value="medical">Medical</option>
-              <option ${asset === 'open space' ? 'selected' : ''} value="open space">Open Space</option>
-              <option ${asset === 'shelter' ? 'selected' : ''} value="shelter">Shelter</option>
-              </select></td>
-              </td>
-          </tr>
-        </table>
-            <div>
-      ${buttons}
-    </div>
+        <select id="assetSelect" ${isDisabled ? 'disabled' : ''}>
+        <option ${asset === 'supplies' ? 'selected' : ''} value="supplies">Supplies</option>
+        <option ${asset === 'staff' ? 'selected' : ''} value="staff">Staff</option>
+        <option ${asset === 'food' ? 'selected' : ''} value="food">Food</option>
+        <option ${asset === 'water' ? 'selected' : ''} value="water">Water</option>
+        <option ${asset === 'energy or fuel' ? 'selected' : ''} value="energy or fuel">Energy/Fuel</option>
+        <option ${asset === 'medical' ? 'selected' : ''} value="medical">Medical</option>
+        <option ${asset === 'open space' ? 'selected' : ''} value="open space">Open Space</option>
+        <option ${asset === 'shelter' ? 'selected' : ''} value="shelter">Shelter</option></select>
+      </td>
+    </tr> 
+  </table>
+  <div>
+  <p style="margin:1px">Description: </p>
+    <textarea id="descriptionTbx" rows="5" cols="30"  value="${description}" ${isDisabled ? 'disabled' : ''}>${description}</textarea>
+  </div>
+  <div>
+    ${buttons}
+  </div>
   `;
   return content;
 }

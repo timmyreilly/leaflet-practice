@@ -1,5 +1,5 @@
 import markers from './markers';
-import { getMarkers } from './api';
+import { getMarkers, getExternalGeoJSON } from './api';
 import { showLoader, hideLoader } from './loader';
 
 let map;
@@ -12,13 +12,6 @@ function getPolylinesStyle(layerName) {
     'default': {color :'blue', "opacity": 0.5},
   }
   return (styles[layerName] || styles["default"]);
-}
-
-//retrieves a geoJSON feature of type FeatureCollection or Feature
-function getExternalGeoJSON(endpoint) {
-  return $.get(`/api/${endpoint}`).then(function(geoJSONFeature) {
-    return geoJSONFeature;
-  });
 }
 
 function getPostmanCollection(){
@@ -104,20 +97,21 @@ function addExternalLayerPopup(feature,layer){
 
 function toggleMapLayer(layerButton, layerName, isExternal){
   let layer = layers[layerName];
-  if (isExternal && $.isEmptyObject(layer._layers)){
+  if (isExternal && $.isEmptyObject(layer._layers)) {
     showLoader();
-    getExternalGeoJSON(layer.endpoint).done(function(featureCollection){
-      layer.addData(featureCollection);
-      layer.eachLayer(function(feature){
-        let geometryType = feature.feature.geometry.type;
-        if (geometryType === "Point") feature.setIcon(markers[layerName]);
-        if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
-        addExternalLayerPopup(feature,layer);
+    getExternalGeoJSON(layer.endpoint)
+      .then((featureCollection) => {
+        layer.addData(featureCollection);
+        layer.eachLayer((feature) => {
+          const geometryType = feature.feature.geometry.type;
+          if (geometryType === "Point") feature.setIcon(markers[layerName]);
+          if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
+          addExternalLayerPopup(feature,layer);
+        });
+        hideLoader();
       });
-      hideLoader();
-    });
     toggle(layer, layerButton);
-  }else{
+  } else {
     toggle(layer, layerButton);
   }
 

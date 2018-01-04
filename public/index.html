@@ -12,13 +12,13 @@
 
     <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
     <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
-    <link rel="stylesheet" href="./leaflet.awesome-markers.css">
+    <link rel="stylesheet" href="./vendor/leaflet.awesome-markers/leaflet.awesome-markers.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
         crossorigin="" />
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./loader.css">
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/loader.css">
 </head>
 
 <body>
@@ -27,8 +27,8 @@
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="icon-bar"></span>
-        <span class="icon-bar"></span>        
-        <span class="icon-bar"></span>                        
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="">RESILIENCY MAP SF</a>
       </div>
@@ -40,13 +40,13 @@
             <li><a href="#">Placeholder</a></li>
               -->
           </ul>
-        </div><!-- end navbar-collapse -->  
+        </div><!-- end navbar-collapse -->
     </header>
 
     <div class="map-holder" style="height: 100%">
     <div id="mapid">
     </div>
-    <div ref="panel" class="layer-panel">    
+    <div ref="panel" class="layer-panel">
         <div ref="toggle" class="layer-toggle">Layers</div>
         <div class="layer-panel-content">
           <h3>Layers</h3>
@@ -61,12 +61,12 @@
         </div>
     </div>
     </div>
-    
+
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
         crossorigin=""></script>
-    <script src="./leaflet.awesome-markers.js"></script>
-    <script type='text/javascript' src='/index.js'></script>
+    <script src="./vendor/leaflet.awesome-markers/leaflet.awesome-markers.js"></script>
+    <script src='./js/bundle.js'></script>
 </body>
 
 </html>

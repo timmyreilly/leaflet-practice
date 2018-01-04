@@ -59,4 +59,7 @@ typings/
 
 # BingMapsCredentials.js
 
-.vscode/ 
+.vscode/
+
+# Webpack
+public/js/bundle.js

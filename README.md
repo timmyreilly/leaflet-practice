@@ -4,8 +4,9 @@
 
 1. Add a .env file to leaflet-practice directory. 
 2. `$ npm install`
-3. `$ node app.js` 
-4. Visit http://localhost:8080/  
+3. `$npm run build` 
+4. `$ node app.js` 
+5. Visit http://localhost:8080/  
 
 ## Notes: 
 

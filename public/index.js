@@ -344,7 +344,7 @@ function popupContent (marker, mode) {
   </table>
   <div>
   <p style="margin:1px">Description: </p>
-    <textarea id="descriptionTbx" rows="5" cols="30"  value="${description}" ${isDisabled ? 'disabled' : ''}>${description}</textarea>
+    <textarea id="descriptionTbx" rows="5" cols="30" style="resize:none;" value="${description}" ${isDisabled ? 'disabled' : ''}>${description}</textarea>
   </div>
   <div>
     ${buttons}

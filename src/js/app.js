@@ -8,6 +8,65 @@ let layers = {};
 let clusterGroups = {};
 let clusterEnabled = true;
 
+// INFO window
+//Functions to show and add hide info container
+function showInfo(){
+  //unique ID of polygon layers. these do not have layerName attached to them as a property so this is for reference
+  let polygonID = this._eventParents[Object.keys(this._eventParents)[0]]._leaflet_id
+  console.log(polygonID)
+  if(polygonID === 1224){
+    $(".infoTitle").text("SF Find Neighborhood")
+    $(".infoAddress").text(`Description: ${this.properties.description}`)
+    $(".infoAdditional").text('')
+  } else if(polygonID === 399){
+    $(".infoTitle").text("Seismic Zones")
+    $(".infoAddress").text('')
+    $(".infoAdditional").text('')
+  } else if(this.properties){
+    $(".infoTitle").text(`Title: ${this.properties.title}`)
+    $(".infoAddress").text('')
+    $(".infoAdditional").text(`Author: ${this.properties.author}`)
+  } else if (this.feature.properties && this.feature.geometry.type !=='MultiPolygon'){
+      $(".infoAdditional").text('')
+      let featureProps = this.feature.properties
+      switch(featureProps.layerName){
+        case "Privately Owned Public Open Spaces":
+          $(".infoTitle").text(`Name: ${featureProps.name}`);
+          $(".infoAddress").text(`Location: ${featureProps.location}`);
+          $(".infoAdditional").text(`Description: ${featureProps.descriptio}`);
+          break;
+        case "Park and Open Space":
+          $(".infoTitle").text(`Name: ${featureProps.parkname}`);
+          break;
+        case "Schools":
+          $(".infoTitle").text(`Campus Name: ${featureProps.campus_name}`)
+          $(".infoAddress").text(`Address: ${featureProps.campus_address}`);
+          break;
+        case "Business Locations":
+          $(".infoTitle").text(`Business Name: ${featureProps.dba_name}`);
+          $(".infoAdditional").text(`Classification: ${featureProps.naic_code_description}`);
+          break;
+        case "City Facilities":
+          $(".infoTitle").text(`Common Name: ${featureProps.common_name}`);
+          $(".infoAddress").text(`Address: ${featureProps.address}`);
+          $(".infoAdditional").text(`Dept Name: ${featureProps.department_name}`);
+          break;
+        case "Health Care Facilities":
+          $(".infoTitle").text(`Name: ${featureProps.facility_name}`);
+          $(".infoAddress").text(`Address: ${featureProps.location_address}`);
+          break;
+        case "Pit Stop Locations":
+          $(".infoTitle").text(`Facility Type: ${featureProps.facilitytype}`);
+          $(".infoAddress").text(`Location: ${featureProps.location}`);
+          $(".infoAdditional").text(`Hours: ${featureProps.hoursofoperation}`);
+          break;
+        default:
+          $(".infoBody").text('');
+        }
+      }
+  $(".infoContainer").show();
+};
+
 function getPolylinesStyle(layerName) {
   let styles = {
     "Seismic Hazard Zones": { "color": "red", "opacity": 0.65 },
@@ -97,60 +156,57 @@ function addExternalLayerPopup(feature) {
   }
 }
 
+//Called on each GEOJSON feature before adding to Map
+function onEachFeature(feature,layer){
+  let layerName;
+  if (feature.properties){
+    layer.bindPopup(`${feature.properties.descriptio}`);
+    layer.on('mouseover', showInfo);
+    layer.on("mouseout", hideInfo);
+    let geometryType = feature.geometry.type;
+    layerName = feature.properties.layerName;
+  };
+  const geometryType = feature.geometry.type;
+  if (geometryType === "Point") layer.setIcon(markers[layerName]);
+  if (geometryType === "MultiPolygon") layer.setStyle(getPolylinesStyle(layerName));
+};
+
+
+function hideInfo(){
+  $(".infoContainer").hide();
+};
+
 function toggleMapLayer(layerButton, layerName, isExternal) {
   let layer = layers[layerName];
   if (isExternal && $.isEmptyObject(layer._layers)) {
     showLoader();
     getExternalGeoJSON(layer.endpoint)
       .then((featureCollection) => {
-        layer.addData(featureCollection);
-        layer.eachLayer((feature) => {
-          const geometryType = feature.feature.geometry.type;
-          if (geometryType === "Point") feature.setIcon(markers[layerName]);
-          if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
-          addExternalLayerPopup(feature, layer);
-        });
-        hideLoader();
-        toggle(layer, layerButton);
+        var geoJsonLayer = L.geoJSON(featureCollection, {
+          //Using pointToLayer to add name of Layer on each feature so we can grab it later --NOT CURRENTLY WORKING WITH POLYGONS--
+          pointToLayer: function(feature, latlng) {
+            feature.properties.layerName = layerName;
+          }
+        })
+      layers[layerName] = L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
+      hideLoader();
+      toggle(layer, layerButton);
       });
   } else {
     toggle(layer, layerButton);
   }
 
   //Toggle active UI status and layer attached to the map
- function toggle(layer, layerButton){
-  if (map.hasLayer(clusterGroups[layerName]) || map.hasLayer(layer)){
-     if (clusterEnabled && isExternal){
-       map.removeLayer(clusterGroups[layerName]);
-     }else{
-       map.removeLayer(layer);
-     }
-     layerButton.classList.remove('toggle-active');
-  }else{
-   if (clusterEnabled && isExternal){
-      let clusters = L.markerClusterGroup();
-      clusters.addLayer(layer);
-      clusterGroups[layerName] = clusters;
-      map.addLayer(clusters);
+  function toggle(layer, layerButton){
+    if (map.hasLayer(layer)){
+        map.removeLayer(layer);
+        layerButton.classList.remove('toggle-active');
     }else{
       map.addLayer(layer);
-    }
-    layerButton.classList.add('toggle-active');
-   }
- }
-/*
-  //Toggle active UI status and layer attached to the map
-  function toggle(layer, layerButton) {
-    if (map.hasLayer(layer)) {
-      map.removeLayer(layer);
-      layerButton.classList.remove('toggle-active');
-    } else {
-      map.addLayer(layer);
-      layerButton.classList.add('toggle-active');
+        layerButton.classList.add('toggle-active');
+      }
     }
   }
-  */
-}
 
 function updateMarker(data, marker) {
   if (data) {
@@ -165,6 +221,10 @@ function updateMarker(data, marker) {
 // Adds html content to our popup marker
 function addPopup(marker) {
   if (marker) {
+    // Binds event listeners to markers that hide and show info window in bottom left on mouseover and mouseout
+    marker.on('mouseover', showInfo);
+    marker.on('mouseout', hideInfo);
+    //Adds html content to our popup marker
     marker.bindPopup(popupContent(marker, 'add'));
     marker.on('popupopen', onPopupOpen);
   }
@@ -209,7 +269,7 @@ function popupContent(marker, mode) {
          <option ${asset === 'open space' ? 'selected' : ''} value="open space">Open Space</option>
          <option ${asset === 'shelter' ? 'selected' : ''} value="shelter">Shelter</option></select>
        </td>
-     </tr> 
+     </tr>
     </table>
     <div>
     <p style="margin:1px">Description: </p>
@@ -329,5 +389,7 @@ function onPopupOpen(e) {
     });
   });
 }
-
+$(document).ready(function(){
+  $(".infoContainer").hide();
+})
 initmap();

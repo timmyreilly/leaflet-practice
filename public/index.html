@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://use.fontawesome.com/3758da217b.js"></script>
-
     <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
     <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
     <link rel="stylesheet" href="./vendor/leaflet.awesome-markers/leaflet.awesome-markers.css">
@@ -24,8 +23,7 @@
 </head>
 
 <body>
-  <header class="navbar navbar-default navbar-static-top">
-    <!-- Brand and toggle get grouped for better mobile display -->
+  <header class="navbar">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="icon-bar"></span>
@@ -45,7 +43,7 @@
         </div><!-- end navbar-collapse -->
     </header>
 
-    <div class="map-holder" style="height: 100%">
+  <div class="map-holder" style="height: 100%">
     <div id="mapid">
     </div>
     <div ref="panel" class="layer-panel">
@@ -61,7 +59,17 @@
               </div>
           </div>
         </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Additional info window displayed in bottom left of screen that is toggled on mouseover of markers -->
+  <div class="infoContainer">
+    <div class="infoBody">
+      <div class="infoTitle"><strong>Name:</strong></div>
+      <div class="infoAddress"><em>Location</em></div>
+      <div class="infoHours"></div>
+      <div class="infoAdditional"></div>
     </div>
 
     <!-- Make sure you put this AFTER Leaflet's CSS -->

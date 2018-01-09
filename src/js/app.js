@@ -5,6 +5,8 @@ import { showLoader, hideLoader } from './loader';
 let map;
 //represents assets
 let layers = {};
+let clusterGroups = {};
+let clusterEnabled = true;
 
 function getPolylinesStyle(layerName) {
   let styles = {
@@ -89,9 +91,9 @@ function createLayerButton(layerName, iconName) {
 }
 
 //Need to be completed. Currently popups are showing [Object object]
-function addExternalLayerPopup(feature, layer) {
+function addExternalLayerPopup(feature) {
   if (feature.feature.properties) {
-    layer.bindPopup(`${feature.feature.properties}`);
+   feature.bindPopup(`${feature.feature.properties}`);
   }
 }
 
@@ -109,12 +111,34 @@ function toggleMapLayer(layerButton, layerName, isExternal) {
           addExternalLayerPopup(feature, layer);
         });
         hideLoader();
+        toggle(layer, layerButton);
       });
-    toggle(layer, layerButton);
   } else {
     toggle(layer, layerButton);
   }
 
+  //Toggle active UI status and layer attached to the map
+ function toggle(layer, layerButton){
+  if (map.hasLayer(clusterGroups[layerName]) || map.hasLayer(layer)){
+     if (clusterEnabled && isExternal){
+       map.removeLayer(clusterGroups[layerName]);
+     }else{
+       map.removeLayer(layer);
+     }
+     layerButton.classList.remove('toggle-active');
+  }else{
+   if (clusterEnabled && isExternal){
+      let clusters = L.markerClusterGroup();
+      clusters.addLayer(layer);
+      clusterGroups[layerName] = clusters;
+      map.addLayer(clusters);
+    }else{
+      map.addLayer(layer);
+    }
+    layerButton.classList.add('toggle-active');
+   }
+ }
+/*
   //Toggle active UI status and layer attached to the map
   function toggle(layer, layerButton) {
     if (map.hasLayer(layer)) {
@@ -125,6 +149,7 @@ function toggleMapLayer(layerButton, layerName, isExternal) {
       layerButton.classList.add('toggle-active');
     }
   }
+  */
 }
 
 function updateMarker(data, marker) {

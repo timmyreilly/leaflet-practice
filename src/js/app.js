@@ -12,14 +12,14 @@ let clusterEnabled = true;
 //Functions to show and add hide info container
 function showInfo(){
   console.log(this)
-  //unique ID of polygon layers. these do not have layerName attached to them as a property so this is for reference
-  let polygonID = this._eventParents[Object.keys(this._eventParents)[0]]._leaflet_id
-  console.log(polygonID)
-  if(polygonID === 1224){
+  //unique color of polygon layers. these do not have layerName attached to them as a property so this is for reference
+  let polygonColor = this.options.color
+  if(polygonColor === 'blue'){
+    console.log(this.feature.properties)
     $(".infoTitle").text("SF Find Neighborhood")
-    $(".infoAddress").text(`Description: ${this.properties.description}`)
+    $(".infoAddress").text(`Name: ${this.feature.properties.name}`)
     $(".infoAdditional").text('')
-  } else if(polygonID === 399){
+  } else if(polygonColor === 'red'){
     $(".infoTitle").text("Seismic Zones")
     $(".infoAddress").text('')
     $(".infoAdditional").text('')
@@ -172,8 +172,6 @@ function onEachFeature(feature,layer){
     layerName = feature.properties.layerName;
   };
   if (geometryType === "Point") layer.setIcon(markers[layerName]);
-
-
 };
 
 
@@ -189,7 +187,6 @@ function toggleMapLayer(layerButton, layerName, isExternal) {
       .then((featureCollection) => {
         var geoJsonLayer = L.geoJSON(featureCollection, {
           //Using pointToLayer to add name of Layer on each feature before sending to onEachFeature so we can access it in onEachFeature
-          // NOT CURRENTLY WORKING WITH POLYGONS--
           pointToLayer: function(feature, latlng) {
             feature.properties.layerName = layerName;
           }

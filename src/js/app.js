@@ -11,11 +11,9 @@ let clusterEnabled = true;
 // INFO window
 //Functions to show and add hide info container
 function showInfo(){
-  console.log(this)
   //unique color of polygon layers. these do not have layerName attached to them as a property so this is for reference
   let polygonColor = this.options.color
   if(polygonColor === 'blue'){
-    console.log(this.feature.properties)
     $(".infoTitle").text("SF Find Neighborhood")
     $(".infoAddress").text(`Name: ${this.feature.properties.name}`)
     $(".infoAdditional").text('')
@@ -69,7 +67,6 @@ function showInfo(){
 };
 
 function getPolylinesStyle(layerName) {
-  console.log(layerName)
   let styles = {
     "Seismic Hazard Zones": { "color": "red", "opacity": 0.65 },
     'default': { color: 'blue', "opacity": 0.5 },

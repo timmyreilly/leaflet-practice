@@ -11,6 +11,7 @@ let clusterEnabled = true;
 // INFO window
 //Functions to show and add hide info container
 function showInfo(){
+  console.log(this)
   //unique ID of polygon layers. these do not have layerName attached to them as a property so this is for reference
   let polygonID = this._eventParents[Object.keys(this._eventParents)[0]]._leaflet_id
   console.log(polygonID)
@@ -68,6 +69,7 @@ function showInfo(){
 };
 
 function getPolylinesStyle(layerName) {
+  console.log(layerName)
   let styles = {
     "Seismic Hazard Zones": { "color": "red", "opacity": 0.65 },
     'default': { color: 'blue', "opacity": 0.5 },
@@ -159,6 +161,9 @@ function addExternalLayerPopup(feature) {
 //Called on each GEOJSON feature before adding to Map
 function onEachFeature(feature,layer){
   let layerName;
+  const geometryType = feature.geometry.type;
+
+
   if (feature.properties){
     layer.bindPopup(`${feature.properties.descriptio}`);
     layer.on('mouseover', showInfo);
@@ -166,9 +171,9 @@ function onEachFeature(feature,layer){
     let geometryType = feature.geometry.type;
     layerName = feature.properties.layerName;
   };
-  const geometryType = feature.geometry.type;
   if (geometryType === "Point") layer.setIcon(markers[layerName]);
-  if (geometryType === "MultiPolygon") layer.setStyle(getPolylinesStyle(layerName));
+
+
 };
 
 
@@ -183,17 +188,22 @@ function toggleMapLayer(layerButton, layerName, isExternal) {
     getExternalGeoJSON(layer.endpoint)
       .then((featureCollection) => {
         var geoJsonLayer = L.geoJSON(featureCollection, {
-          //Using pointToLayer to add name of Layer on each feature so we can grab it later --NOT CURRENTLY WORKING WITH POLYGONS--
+          //Using pointToLayer to add name of Layer on each feature before sending to onEachFeature so we can access it in onEachFeature
+          // NOT CURRENTLY WORKING WITH POLYGONS--
           pointToLayer: function(feature, latlng) {
             feature.properties.layerName = layerName;
           }
         })
-      layers[layerName] = L.geoJSON(featureCollection ,{onEachFeature: onEachFeature}).addTo(map);
+      layers[layerName] = L.geoJSON(featureCollection , {style: function(feature) {
+        if(feature.geometry.type==='MultiPolygon'){
+          return getPolylinesStyle(layerName);
+        }
+      }, onEachFeature: onEachFeature}).addTo(map);
       hideLoader();
       toggle(layer, layerButton);
       });
-  } else {
-    toggle(layer, layerButton);
+    } else {
+      toggle(layer, layerButton);
   }
 
   //Toggle active UI status and layer attached to the map

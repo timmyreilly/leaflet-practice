@@ -149,28 +149,15 @@ function createLayerButton(layerName, iconName) {
 }
 
 //Need to be completed. Currently popups are showing [Object object]
-function addExternalLayerPopup(feature) {
+function addExternalLayerPopup(feature, layerName) {
+  console.log(feature);
+  feature.feature.properties.layerName = layerName;
   if (feature.feature.properties) {
-   feature.bindPopup(`${feature.feature.properties}`);
+   feature.bindPopup(`${feature.feature.geometry.coordinates}`);
+   feature.on('mouseover', showInfo);
+   feature.on("mouseout", hideInfo);
   }
 }
-
-//Called on each GEOJSON feature before adding to Map
-function onEachFeature(feature,layer){
-  let layerName;
-  const geometryType = feature.geometry.type;
-
-
-  if (feature.properties){
-    layer.bindPopup(`${feature.properties.descriptio}`);
-    layer.on('mouseover', showInfo);
-    layer.on("mouseout", hideInfo);
-    let geometryType = feature.geometry.type;
-    layerName = feature.properties.layerName;
-  };
-  if (geometryType === "Point") layer.setIcon(markers[layerName]);
-};
-
 
 function hideInfo(){
   $(".infoContainer").hide();
@@ -182,35 +169,42 @@ function toggleMapLayer(layerButton, layerName, isExternal) {
     showLoader();
     getExternalGeoJSON(layer.endpoint)
       .then((featureCollection) => {
-        var geoJsonLayer = L.geoJSON(featureCollection, {
-          //Using pointToLayer to add name of Layer on each feature before sending to onEachFeature so we can access it in onEachFeature
-          pointToLayer: function(feature, latlng) {
-            feature.properties.layerName = layerName;
-          }
-        })
-      layers[layerName] = L.geoJSON(featureCollection , {style: function(feature) {
-        if(feature.geometry.type==='MultiPolygon'){
-          return getPolylinesStyle(layerName);
-        }
-      }, onEachFeature: onEachFeature}).addTo(map);
-      hideLoader();
-      toggle(layer, layerButton);
+        layer.addData(featureCollection);
+        layer.eachLayer((feature) => {
+          const geometryType = feature.feature.geometry.type;
+          if (geometryType === "Point") feature.setIcon(markers[layerName]);
+          if (geometryType === "MultiPolygon") feature.setStyle(getPolylinesStyle(layerName));
+          addExternalLayerPopup(feature, layerName);
+        });
+        hideLoader();
+        toggle(layer, layerButton);
       });
-    } else {
-      toggle(layer, layerButton);
+  } else {
+    toggle(layer, layerButton);
   }
 
   //Toggle active UI status and layer attached to the map
-  function toggle(layer, layerButton){
-    if (map.hasLayer(layer)){
-        map.removeLayer(layer);
-        layerButton.classList.remove('toggle-active');
+ function toggle(layer, layerButton){
+  if (map.hasLayer(clusterGroups[layerName]) || map.hasLayer(layer)){
+     if (clusterEnabled && isExternal){
+       map.removeLayer(clusterGroups[layerName]);
+     }else{
+       map.removeLayer(layer);
+     }
+     layerButton.classList.remove('toggle-active');
+  }else{
+   if (clusterEnabled && isExternal){
+      let clusters = L.markerClusterGroup();
+      clusters.addLayer(layer);
+      clusterGroups[layerName] = clusters;
+      map.addLayer(clusters);
     }else{
       map.addLayer(layer);
-        layerButton.classList.add('toggle-active');
-      }
     }
-  }
+    layerButton.classList.add('toggle-active');
+   }
+ }
+}
 
 function updateMarker(data, marker) {
   if (data) {
